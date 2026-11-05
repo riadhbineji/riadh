@@ -1,1020 +1,452 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>علاقات التغذية والنظم البيئية البحرية</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts (Cairo & Inter) -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        ocean: {
-                            deep: '#031927',
-                            dark: '#0a369d',
-                            blue: '#006494',
-                            teal: '#05b292',
-                            light: '#e8f1f5',
-                            coral: '#ff6b6b',
-                            gold: '#ffd166',
-                            emerald: '#06d6a0'
-                        }
-                    },
-                    fontFamily: {
-                        cairo: ['Cairo', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-            background: linear-gradient(135deg, #031927 0%, #0a369d 50%, #006494 100%);
-            min-height: 100vh;
-            color: #f8fafc;
-        }
-
-        /* Glassmorphism Effect */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        .glass-nav {
-            background: rgba(3, 25, 39, 0.85);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Custom Animated Background Bubbles */
-        .bubble {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            animation: floatUp 12s infinite ease-in;
-            pointer-events: none;
-        }
-
-        @keyframes floatUp {
-            0% { transform: translateY(100vh) scale(0); opacity: 0; }
-            50% { opacity: 0.6; }
-            100% { transform: translateY(-100px) scale(1.2); opacity: 0; }
-        }
-
-        /* Dynamic Nav Tab Active State */
-        .tab-btn.active {
-            background: linear-gradient(90deg, #05b292 0%, #006494 100%);
-            border-color: #ffd166;
-            box-shadow: 0 0 15px rgba(5, 178, 146, 0.6);
-            transform: translateY(-2px);
-        }
-
-        /* Glowing Effects */
-        .glow-text {
-            text-shadow: 0 0 10px rgba(255, 209, 102, 0.5);
-        }
-
-        .glow-box-coral {
-            box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #031927;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #05b292;
-            border-radius: 4px;
-        }
-
-        /* Certificate Print CSS */
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #certificate-modal, #certificate-modal * {
-                visibility: visible;
-            }
-            #certificate-modal {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                background: white;
-                color: black;
-            }
-        }
-    </style>
-</head>
-<body class="relative overflow-x-hidden min-h-screen flex flex-col justify-between">
-
-    <!-- Background Bubble Layer -->
-    <div id="bubbles-container" class="fixed inset-0 pointer-events-none z-0"></div>
-
-    <!-- Header Section -->
-    <header class="glass-nav sticky top-0 z-50 px-4 py-3 shadow-2xl">
-        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-            <!-- Branding -->
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-ocean-teal to-ocean-gold flex items-center justify-center text-ocean-deep text-2xl font-black shadow-lg">
-                    <i class="fa-solid fa-water"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl font-extrabold text-white tracking-wide flex items-center gap-2">
-                        <span>مدرسة الخليل بن عبد الله (11-12)</span>
-                        <span class="text-xs bg-ocean-teal/30 text-ocean-gold px-2 py-0.5 rounded-full border border-ocean-gold/40">العلوم البيئية</span>
-                    </h1>
-                    <p class="text-xs text-ocean-gold font-medium">إعداد وإشراف: <span class="font-bold text-white">أ. رياض بن ناجي بن عمر</span></p>
-                </div>
-            </div>
-
-            <!-- Header Controls & Progress -->
-            <div class="flex items-center gap-4">
-                <!-- Lesson Progress -->
-                <div class="hidden sm:flex flex-col items-end">
-                    <span class="text-xs text-gray-300 font-semibold mb-1" id="progress-text">التقدم: 25%</span>
-                    <div class="w-36 h-2 bg-gray-800 rounded-full overflow-hidden border border-white/10">
-                        <div id="progress-bar" class="h-full bg-gradient-to-r from-ocean-teal to-ocean-gold w-1/4 transition-all duration-500"></div>
-                    </div>
-                </div>
-
-                <!-- Sound FX Toggle Button -->
-                <button id="sound-btn" onclick="toggleAudio()" title="كتم/تشغيل الصوت" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-ocean-gold transition-all">
-                    <i class="fa-solid fa-volume-high text-lg" id="sound-icon"></i>
-                </button>
-
-                <!-- Fullscreen Toggle Button -->
-                <button onclick="toggleFullScreen()" title="ملء الشاشة" class="w-10 h-10 rounded-xl bg-ocean-teal/20 hover:bg-ocean-teal/40 border border-ocean-teal/50 flex items-center justify-center text-white transition-all shadow-md">
-                    <i class="fa-solid fa-expand text-lg"></i>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Navigation Bar (Tabs) -->
-    <div class="max-w-7xl mx-auto px-4 mt-6 z-10 w-full">
-        <div class="glass-card p-2 rounded-2xl flex flex-wrap gap-2 justify-center border border-white/10">
-            <button onclick="switchTab('tab1', 25)" class="tab-btn active px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all border border-transparent hover:bg-white/10">
-                <i class="fa-solid fa-seedling text-ocean-gold"></i>
-                <span>1. أنواع التغذية البحرية</span>
-            </button>
-            <button onclick="switchTab('tab2', 50)" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all border border-transparent hover:bg-white/10">
-                <i class="fa-solid fa-layer-group text-cyan-400"></i>
-                <span>2. نطاقات المحيط والإنتاجية</span>
-            </button>
-            <button onclick="switchTab('tab3', 75)" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all border border-transparent hover:bg-white/10">
-                <i class="fa-solid fa-calculator text-emerald-400"></i>
-                <span>3. مسار الطاقة والمعادلة</span>
-            </button>
-            <button onclick="switchTab('tab4', 90)" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all border border-transparent hover:bg-white/10">
-                <i class="fa-solid fa-chart-pyramid text-coral-400"></i>
-                <span>4. الأهرامات البيئية</span>
-            </button>
-            <button onclick="switchTab('tab5', 100)" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all border border-transparent hover:bg-white/10">
-                <i class="fa-solid fa-award text-yellow-300"></i>
-                <span>5. التقويم الختامي</span>
-            </button>
-        </div>
+ <head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20261029-04-b05d899","C":{"ABeeZee":"YADK31-VBBc,1","Abel":"YAHO2Ehol3g,0","Abhaya Libre":"YAFdJvwa-l0,0","Abril Fatface":"YACgEZbkUVE,0","Acme":"YAHO2Gflqzo,0","Actor":"YAHO2N0IV_4,0","Adamina":"YAHO2Ko8ddg,0","Advent Pro":"YAFdJvNZdCk,0","Afacad":"YAHO2HaK_fU,0","Afacad Flux":"YAHO2DjbA6Y,0","Akshar":"YAGWNF0jApg,0","Alata":"YAD1aLikJo8,0","Albert Sans":"YAHO2HRfeh4,0","Alegreya":"YAFdJs07v-8,0","Alegreya Sans":"YAFdJvgJ5TU,0","Alegreya Sans SC":"YAFdJuaTEaM,0","Alegreya SC":"YACgEen8jXo,0","Aleo":"YAFdJg_txOU,0","Alex Brush":"YAE2gr0Mbng,0","Alexandria":"YAGVt-AWBcU,0","Alfa Slab One":"YACgEYS9sJU,0","Alice":"YALBszUSD-E,0","Allura":"YACgEap1YR0,0","Almarai":"YAFdJuZe0mI,0","Alumni Sans":"YAHO2DByoho,0","Amaranth":"YACgEaBTFMQ,0","Amatic SC":"YACgEbSBm0k,0","Amiri":"YAEWgjWFb1M,0","Amita":"YADK309xYYo,1","Andika":"YACkoFAye4w,0","Anek Bangla":"YAGVuloYrvI,0","Anek Latin":"YAHO2C6lVnU,0","Anek Telugu":"YAHO2KVu8lI,0","Anonymous Pro":"YACgEV9owk4,0","Antic Slab":"YAHO2HJeTP0,0","Anton":"YACgEcYqQ-A,0","Antonio":"YAFdJjZxcpY,0","Anybody":"YAHO2MTsics,0","Arapey":"YADK32AK2Uk,1","Architects Daughter":"YACgEc9BFCs,0","Archivo":"YAHO2-t-jNE,0","Archivo Black":"YACgEZulLoA,0","Archivo Narrow":"YACgEa-oJH8,0","Arial":"YAGyDvJ_4Ts,0","Arimo":"YACgEZ1cb1Q,0","Arsenal":"YADK3_DWcOc,0","Arvo":"YACgEf17hXM,0","Asap":"YAFdJr0OaFw,0","Asap Condensed":"YAD1fmY3NpE,0","Assistant":"YAFdtfahXt8,0","Atkinson Hyperlegible":"YAFge7Z-F6s,0","Atkinson Hyperlegible Next":"YAHO2IeQVB0,0","Audiowide":"YAHO2MsoafU,0","Avenir":"YAFcfmNq6UY,0","Azeret Mono":"YAHO2EIdDP0,0","Bad Script":"YADK31ojH6A,1","Bagel Fat One":"YAFyG3A11Bw,0","Bai Jamjuree":"YAFdJjI5olU,0","Baloo 2":"YAHO2IcQUcM,0","Balsamiq Sans":"YAE3C_w4eo8,0","Bangers":"YAD5qTdjGKo,1","Barlow":"YAFdJsyuOPM,1","Barlow Condensed":"YAFdJljEuFc,0","Barlow Semi Condensed":"YAFdJu55qXI,0","Baskervville":"YAHO2JTYNKo,0","Bebas Neue":"YACgESME5ew,0","Belanosima":"YAHO2KW8vyU,0","Bellefair":"YADSJ8TFXwA,0","Belleza":"YADK3w_fTc4,0","BenchNine":"YAHO2Gl7yMc,0","Berkshire Swash":"YACgEa7uPMI,0","Besley":"YAHO2BTXWYc,0","Bevan":"YACkoDaMIbc,0","Big Shoulders Display":"YAFdJs8L2aw,0","Biryani":"YAFdtZ_PRAs,0","Bitter":"YACkoOF0Xck,0","BIZ UDPGothic":"YAGWY3VAK4Q,0","Black Ops One":"YACgEaY4FIU,0","Blinker":"YAFdJoBYX9o,0","Bodoni Moda":"YAHO2C7VUJE,0","Bowlby One":"YAHO2EunPos,0","Bowlby One SC":"YAHO2J38FUs,0","Bree Serif":"YACkoD1yZN0,0","Bricolage Grotesque":"YAFyMcdwzpc,0","Bungee":"YALBszL9wLA,0","Cabin":"YAFdJnEgsb0,0","Cabin Condensed":"YAHO2F-FVVw,0","Cairo":"YAFdtXpDzlQ,0","Calistoga":"YAD1aIFxe3I,1","Cambria":"YAFcfgNlM2Y,0","Cantarell":"YAHO2LSCGX4,0","Canva Sans":"YAFdJjTk5UU,1","Caprasimo":"YAHO2PYTkbo,0","Cardo":"YACkoGIT9qo,0","Carlito":"YACkoIZXsrc,0","Carter One":"YACgEZJ1Flw,0","Catamaran":"YAFdJhPTLAc,0","Caveat":"YALBs2ploWQ,0","Caveat Brush":"YALBs8ZVRhw,0","Chakra Petch":"YAD1fCkY3IQ,0","Changa":"YAFdJtbG8fw,0","Changa One":"YAHO2WdsbtM,0","Chango":"YADK37RW0po,0","Charis SIL":"YAGvf-G3GGU,0","Charm":"YAD1b_s4o-w,0","Chelsea Market":"YAHO2UOd5sY,0","Chewy":"YACgEZfALnA,0","Chivo":"YAHO2WvGfDs,0","Chivo Mono":"YAHO2Qd3y5g,0","Cinzel":"YACgEeV8bIQ,0","Cinzel Decorative":"YAEe9XbWpNs,0","Comfortaa":"YAFdJoWmhxU,0","Comic Neue":"YAHO2VMiyZo,0","Commissioner":"YAHO2RRI-KE,0","Concert One":"YAFyG1vOkaw,0","Consolas":"YAFcfu6YYdE,0","Cookie":"YAHO2TxA9Mk,0","Cormorant Garamond":"YAFdJhX-538,0","Cormorant Infant":"YAHO2cgbXjc,0","Cormorant SC":"YAFdJg7KuRM,0","Courgette":"YACgEU5nS9M,0","Courier New":"YAGzXiGs0_8,0","Courier Prime":"YAD1aFjegN8,0","Cousine":"YADK35VyDYU,0","Crete Round":"YAHO2Uu9SvI,0","Crimson Pro":"YAFdJsEGkW0,0","Crimson Text":"YAHO2RsfBzg,0","Cuprum":"YACkoB3fESg,0","Cutive Mono":"YAHO2cov6H4,0","Damion":"YAHO2SxDErM,0","Dancing Script":"YALBs2pfuW0,0","Darker Grotesque":"YAD1acp_tgc,1","Delius":"YAHO2f1B8B4,0","Didact Gothic":"YALBs-mIj2o,0","DM Mono":"YAHO2SGpw0w,0","DM Sans":"YAD1aU3sLnI,0","DM Serif Display":"YAD1aYG82rc,0","Domine":"YAHO2bbCOA4,0","Dongle":"YAGXDU1dmuc,0","Doppio One":"YAHO2ckhWaI,0","Dosis":"YAFdte3F-n0,1","DynaPuff":"YAFyMRnxBDs,0","Eater":"YAHO2VpLF0c,0","EB Garamond":"YAFdJtfMD6Y,0","Economica":"YACgEeIOo5w,0","Eczar":"YAFdJrnVElk,0","El Messiri":"YAFdJoZarj8,0","Encode Sans":"YAHO2R-vLyo,0","Encode Sans Condensed":"YAHO2RQWhbg,0","Epilogue":"YAHO2WWHRqI,0","Exo":"YACgEf2dbI4,0","Exo 2":"YAFdJor4M6A,1","Fahkwang":"YAFdJp0SJos,0","Familjen Grotesk":"YAHO2ZriIzU,0","Faustina":"YAFdJnqy8Oc,0","Figtree":"YAHO2b-mV7A,0","Fira Code":"YAFdJsxBlTg,0","Fira Mono":"YAHO2bTKfjg,0","Fira Sans":"YAFdJnJKOPE,0","Fira Sans Condensed":"YAHMLJN-FcA,0","Fira Sans Extra Condensed":"YAHMLGqUb6Q,0","Fjalla One":"YAHO2VMyTKw,0","Forum":"YACgEcnnqB4,0","Francois One":"YADK3zbC6RM,0","Frank Ruhl Libre":"YAFdJiGIKxQ,0","Fraunces":"YAFdJpU7Kkk,0","Fredoka":"YACgEZml080,0","Fugaz One":"YAHO2f5L5K0,0","Funnel Display":"YAHO2TmVuEs,0","Funnel Sans":"YAHO2R0FK5U,0","Gabarito":"YAHO2cD3JmI,0","Gantari":"YAHO2WveuBo,0","Geist":"YAHO2SfKS30,0","Geist Mono":"YAHO2XOe8v8,0","Gelasio":"YAHO2e426-k,0","Gentium Book Plus":"YAHO2b-adyU,0","Geologica":"YAHMLpZ3y5c,0","Georama":"YAHO21l9KR8,0","Georgia":"YAGzXkO0pEM,0","GFS Didot":"YADK39vXpyU,0","Gilda Display":"YADK34sD2QM,0","Gloock":"YAHO2WVhd0Q,0","Gloria Hallelujah":"YALBs50JjRs,0","Gochi Hand":"YACgEWWPgRQ,0","Goldman":"YAHO2TATES8,0","Golos Text":"YAHO2QlqAQk,0","Google Sans":"YAHO2dYZ4Uw,0","Google Sans Code":"YAHO2XdQwlA,0","Google Sans Flex":"YAHO2e8mtck,0","Goudy Bookletter 1911":"YAHO2X7CqQQ,0","Gowun Dodum":"YAGXDZ921io,0","Grandstander":"YAHO2bN2hd8,0","Gravitas One":"YAHO2WtqHRw,0","Great Vibes":"YACgEX27qLg,0","Gruppo":"YACgEbcz8MU,0","Gudea":"YAHO2WlVs30,0","Hammersmith One":"YACgEWNFnT4,0","Handlee":"YAHO2U9C-xI,0","Hanken Grotesk":"YAHO2VB9G0I,0","Heebo":"YAFdJqqaebw,0","Helvetica":"YAFcf7zkXN0,0","Hind Guntur":"YAFdJq1FbIc,0","Hind Madurai":"YAFdJtsMgQk,0","Hind Siliguri":"YAFdJodBWQk,0","Hind Vadodara":"YAFdJrnuAas,0","Homemade Apple":"YADK3zBTjLs,0","Host Grotesk":"YAHO2VztvdY,0","Hubot Sans":"YAHO2cDVt0E,0","IBM Plex Mono":"YAFdJkmvhGI,0","IBM Plex Sans":"YAFdJgT0SHI,0","IBM Plex Sans Arabic":"YAGVuEYCNg0,1","IBM Plex Sans Condensed":"YAFdJrPBof8,0","IBM Plex Sans JP":"YAGWY6rvaqo,0","IBM Plex Sans KR":"YAGXDbUrwEo,0","IBM Plex Sans Thai":"YAFdJkdZC28,0","IBM Plex Serif":"YAFdJt16xgA,0","IM Fell English":"YAHO2QB0QVo,0","Impact":"YAFcfnjI7Vk,0","Inclusive Sans":"YAGzRvSP2H0,0","Inconsolata":"YAHO2SpO-5g,0","Indie Flower":"YAHO2aaUih8,0","Instrument Sans":"YAHO2bKyaSQ,0","Instrument Serif":"YAHFeOnZNEk,0","Inter":"YAFdJvSyp_k,3","Inter Tight":"YAHO2Wv04Hw,0","Istok Web":"YAHO2XNFLkI,0","Italiana":"YAHO2Toik_w,0","Italianno":"YADK33wZXP4,1","Itim":"YAE0Z3ly4AQ,0","Jacques Francois":"YAHO2a5g66Q,0","Jersey 25":"YAHO2b0HdSo,0","JetBrains Mono":"YAFdJksXcAk,0","Josefin Sans":"YAFdJjvw9Ps,0","Josefin Slab":"YACgEQmaEIc,0","Jost":"YAHO2TSelXg,0","Jua":"YADK3-gZSDU,0","Julius Sans One":"YACgET-7cBI,0","Jura":"YAFdJmtyccY,0","Kaisei Decol":"YAGWY5xJxfk,0","Kalam":"YAFdJrEg2ic,0","Kanit":"YAHO2TvSf7E,0","Kantumruy Pro":"YAHO2SVqwqY,0","Karla":"YAHO2V2NSXM,0","Kaushan Script":"YACgEbGmrJs,0","Khand":"YAFdJm18w3g,0","Khula":"YAFdJvaOkWI,0","Knewave":"YACgEYSBEEA,0","Kosugi Maru":"YAEhL82apSM,0","Krub":"YAFdJl9ACwk,0","Kumbh Sans":"YAHO2UjzjpM,0","Lalezar":"YACkoB188Y0,0","Lato":"YAFdJuFCnaw,0","League Gothic":"YACgEZ1OEPI,0","League Spartan":"YACgEcnJpjs,0","Leckerli One":"YAGX4ddZAAg,0","Lemonada":"YAFdtQVfQCk,0","Lexend":"YAHO2SCkHoU,0","Lexend Deca":"YAD9UdTHECk,0","Lexend Giga":"YAD9UYAqrOc,0","Lexend Mega":"YAD9UdrjgZw,0","Libre Baskerville":"YACgEUFdPdA,0","Libre Bodoni":"YAHO2fbN094,0","Libre Caslon Display":"YAHO2XhLmt0,0","Libre Caslon Text":"YAHO2USylHk,0","Libre Franklin":"YAFdJr3SNlU,1","Lilita One":"YACgEblklxo,0","Limelight":"YACgEUpkTXE,0","LINE Seed JP":"YAHO2d8yXa4,0","Literata":"YAD1b0SpOHQ,0","Lobster":"YAD8SnSjSFI,0","Lobster Two":"YACgEesdoec,0","Londrina Solid":"YAFdJnyMeQE,0","Lora":"YACgEXvxf8Q,0","Luckiest Guy":"YADK4PnlFRs,0","Lusitana":"YAHO2SveFfM,0","M PLUS 1p":"YAHO2fozO7I,0","M PLUS 2":"YAHO2RUGZcQ,0","Mada":"YAFd-HxC1Y0,0","Mali":"YAFdJh7OuNE,0","Manrope":"YAHO2b2feC4,0","Mansalva":"YAD1aZCCYU8,1","Marcellus":"YADK4L2nGbg,0","Marck Script":"YALBs9DBETo,0","Martel":"YAFdtY7FRH8,1","Martian Mono":"YAHO2YhUMkk,0","Mate":"YAHO2eaPuMk,0","Maven Pro":"YAFdJgCyb_c,0","Merienda":"YAGXhISLJkY,0","Merriweather":"YACgEXvHxxs,0","Merriweather Sans":"YAFdJorZgto,1","Michroma":"YADK4IYX8vY,0","Mitr":"YAFdJh-DKf0,0","Mona Sans":"YAHO2XGz2BM,0","Monda":"YADK34lACd0,1","Monoton":"YALBs_hWWG8,0","Montserrat":"YAFdtQi73Xs,0","Montserrat Alternates":"YAHO2d5URdI,0","Mooli":"YAHO2QudnvU,0","Mr Dafoe":"YACgEbw4BXM,0","Mrs Saint Delafield":"YAHO2Tnt53k,0","Ms Madi":"YAHO2SBc4rI,0","Mukta":"YAFdJjsZaSM,0","Mulish":"YAHO28rytyw,0","Nanum Myeongjo":"YAFdJqiu4VY,0","Neuton":"YAFdtcDBvdA,0","News Cycle":"YACkoEMGWek,0","Nothing You Could Do":"YAHO2WqRm_c,0","Noticia Text":"YACkoDm0xlE,0","Noto Color Emoji":"YAGumpcTCok,0","Noto Kufi Arabic":"YACkoGW2dTA,0","Noto Naskh Arabic":"YACkoI8Oj1c,0","Noto Nastaliq Urdu":"YAGU_Q5u0w4,0","Noto Sans":"YACkoCjjZNk,0","Noto Sans Bengali":"YAFdJjnhMdI,0","Noto Sans Display":"YAHO2eyZBeY,0","Noto Sans Georgian":"YACkoFKxqWs,0","Noto Sans HK":"YAHO2fCytzw,0","Noto Sans JP":"YAFdJiHXlcI,0","Noto Sans Khmer":"YACkoFdRIJM,0","Noto Sans KR":"YAGsojZj-RQ,0","Noto Sans Malayalam":"YACkoMzSo98,0","Noto Sans Mono":"YAHO2TFVtN0,0","Noto Sans SC":"YAHO2hDCDFM,0","Noto Sans Symbols":"YAHO2n0Zh0w,0","Noto Sans Tamil":"YAHO2r9jkew,0","Noto Sans TC":"YAHO2pzGHBE,0","Noto Sans Telugu":"YAHO2uFAQs4,0","Noto Serif":"YACkoGNq-XY,0","Noto Serif Bengali":"YAGVuu_j8c8,0","Noto Serif Display":"YAFdJllHsUM,0","Nunito":"YAFdJoNRMmU,1","Nunito Sans":"YAFdtQJYB9w,1","Old Standard TT":"YAHO2lhtDcg,0","Oleo Script":"YACgEQQ14jI,0","Onest":"YAHO2kaArOY,0","Open Sans":"YAFdJt8dAY0,1","Orbitron":"YAHO2tXXH_o,0","Oswald":"YACgEQY10lw,0","Outfit":"YAHO2nVlg14,0","Overpass":"YAFdJhmdIMM,1","Oxanium":"YAHO2kINDn0,0","Oxygen":"YAHO2nOU31A,0","Pacifico":"YADLjORQ1u4,0","Pangolin":"YADK4DH4-fM,0","Parisienne":"YACgERSYqTw,0","Parkinsans":"YAHO2j-ZSEo,0","Passion One":"YAFdJo9cFec,0","Pathway Gothic One":"YACkoMQo7Mc,0","Patrick Hand":"YAHO2swKcgg,0","Patua One":"YAHO2qRZWLE,0","Paytone One":"YALBs8J6By4,0","Permanent Marker":"YACgEcB-r-s,0","Petrona":"YADK4PUbnVg,1","Philosopher":"YAEkTCvkg7Q,0","Pinyon Script":"YACgEQzTJgs,0","Pirata One":"YALBs3j2Xx0,0","Pixelify Sans":"YAHO2v5ARTA,0","Play":"YADK4EFto8o,0","Playball":"YAHO2hWLQJ0,0","Playfair Display":"YAFdJhem5V8,1","Playfair Display SC":"YACgESE7eJQ,0","Plus Jakarta Sans":"YAHO2gdhi18,0","Poiret One":"YAHO2nweLas,0","Pontano Sans":"YAHO2t91rWw,0","Poppins":"YAFdJjbTu24,1","Prata":"YACgES4qGnk,0","Press Start 2P":"YAFyGr-8pmQ,0","Pridi":"YAFdJmJ3gqA,0","Prompt":"YAFdJmA6sOY,0","Proxima Nova":"YAFcfjveRFU,0","Proza Libre":"YAHO2nv0NKc,0","PT Mono":"YAHO2lnK_7w,0","PT Sans":"YACgEYbsV-E,0","PT Sans Caption":"YAHO2oZpTQc,0","PT Sans Narrow":"YAHO2glZymI,0","PT Serif":"YACgEcU7Qg4,0","Public Sans":"YAFdJj8NdaU,1","Quantico":"YAHO2me4bVc,0","Quattrocento":"YACgEcL5b3s,0","Quattrocento Sans":"YAHO2vuaC0Y,0","Questrial":"YADK4LSvvyE,1","Quicksand":"YAFdJpYtCxE,1","Racing Sans One":"YACgEbcqMPM,0","Radio Canada":"YAHO2qxyljs,0","Radio Canada Big":"YAHO2r7P8wg,0","Rajdhani":"YAFdJoWaWgo,0","Raleway":"YAFdJhmxbVQ,1","Ramabhadra":"YACkoN_hhSs,0","Rammetto One":"YAHO2nAqWuQ,0","Readex Pro":"YAGVt3RBO3c,0","Red Hat Display":"YAD1bzs0p0Y,0","Red Hat Mono":"YAHO2gB0kV8,0","Red Hat Text":"YAHO21kkNWg,0","Reddit Sans":"YAHO2kKAR-8,0","Reem Kufi":"YADSJ0ceOYQ,0","Reenie Beanie":"YAHO2s4qTnk,0","Rethink Sans":"YAHO2q9_FzY,0","Righteous":"YAHO2oo4-So,0","roboto":"YACgEev4gKc,0","Roboto Condensed":"YACgEan-tYE,0","Roboto Flex":"YAHO2nqK4E8,0","Roboto Mono":"YAFdJkvp3-k,0","Roboto Slab":"YAFdJswIKAg,0","Rock Salt":"YAHO2vFSVxE,0","Rockwell":"YAFcfyVZnN0,0","Rokkitt":"YAFdJnlBl3o,0","Ropa Sans":"YACkoCA_LhY,0","Rowdies":"YAFyL2wl4FI,0","Rozha One":"YACkoMIfZVA,0","Rubik":"YAFdJsMWVVc,0","Rubik Mono One":"YAHO2qtMuC0,0","Ruda":"YAFdJuuBNyM,1","Rye":"YACgEdQP21k,0","Sacramento":"YACgEf5ivwU,0","Saira":"YAFdJk33d3s,0","Saira Condensed":"YAFdJuBuAxg,0","Saira Extra Condensed":"YAFdJiQUvWc,0","Saira Semi Condensed":"YAHO2gfd5g8,0","Saira Stencil One":"YAD1aV1l2HE,0","Sanchez":"YACgEbBJLy8,0","Sarabun":"YAFdJssSnME,0","Sarala":"YADK4LF5xeY,0","Satisfy":"YACgEf5XTk0,0","Sawarabi Mincho":"YAD1faq7yjk,0","Schibsted Grotesk":"YAHO2sWydRk,0","Segoe UI":"YAHNdRD1Klw,0","Sen":"YAHO2h5vrRE,0","Shadows Into Light":"YAHO2tztN1k,0","Share Tech":"YAHO2q4NPs0,0","Share Tech Mono":"YAHO2oHio98,0","Shippori Mincho":"YAGWZNRJkO8,0","Shippori Mincho B1":"YAGWZJnXF8c,0","Shrikhand":"YACkoEA0Kc0,0","Signika":"YACgEfiK7GI,0","Signika Negative":"YAHO2rWYEng,0","Silkscreen":"YAHO2rdlQ_o,0","Skranji":"YAHO2uPivlQ,0","Slabo 13px":"YAHO2hvaP1I,0","Slabo 27px":"YAHO2n--yeE,0","Smooch Sans":"YAHO2tPdb20,0","Sniglet":"YACgEUJSCy8,0","Sofia":"YAHO2kq3qHg,0","Sofia Sans":"YAHMLUINeco,0","Sofia Sans Condensed":"YAHMLQmSo-Y,0","Sofia Sans Extra Condensed":"YAHMLV0fp0c,0","Sora":"YAHO2rDTR1E,0","Sorts Mill Goudy":"YADK4Fi0R2c,0","Source Code Pro":"YAHO2tzIJbg,0","Source Sans 3":"YAG4lO1Mj10,0","Space Grotesk":"YAHO2sjPCSM,0","Space Mono":"YADW1-vpsoc,0","Special Elite":"YACgEYVlm9Q,0","Special Gothic Expanded One":"YAHO2oaS0m0,0","Spectral":"YAHO2rVUHIM,0","Spline Sans":"YAHO2rZC9CE,0","Squada One":"YADK4PDlAAM,0","Sriracha":"YALBs4sJbXs,0","Staatliches":"YAD1bzJCL-s,0","Stardos Stencil":"YADK4Mu_Xj0,1","STIX Two Text":"YAHO2joycuk,0","Suez One":"YACkoJMi7_c,0","Syncopate":"YAHO2iXpgDY,0","Syne":"YAHML9oLRPc,0","Tahoma":"YAFcfipOFgg,0","Tajawal":"YAFdJg45t1g,0","Tangerine":"YADK4L8oUVI,0","Taviraj":"YAFdJjquxqU,0","Teko":"YAFdJsF6lbU,0","Tektur":"YAHMLdkk1tM,0","Tenor Sans":"YACgEVY5j_w,0","Tilt Warp":"YAHO2uqld84,0","Times New Roman":"YAGzXW3gftg,0","Tinos":"YACkoJyNZF4,0","Tiro Devanagari Hindi":"YAGWNCjUq0o,0","Titan One":"YAHO2v8eA3A,0","Titillium Web":"YAFdtTOE9xo,0","Trebuchet MS":"YAFcfrglpVA,0","Ubuntu":"YACgERDU--Q,0","Ubuntu Condensed":"YAHO2nCaahY,0","Ubuntu Mono":"YAHO2g6B-Uo,0","Ultra":"YACgEWHSPx0,0","Unbounded":"YAHO2rkdmWY,0","Unica One":"YALBs74Pdjc,0","Unna":"YADK4PtOh7E,0","Urbanist":"YAHO2o1IFy0,0","Varela":"YAHO2gPi4IU,0","Varela Round":"YALBs2IK6rw,0","Vazirmatn":"YAHO2z1lH5c,0","Verdana":"YAGzXTctYtQ,0","Vidaloka":"YACgEdRnAX0,0","Viga":"YAHO2v8Lzbg,0","Volkhov":"YAHO2uWq-qg,0","Vollkorn":"YAFdJli9wSA,0","VT323":"YACgEYI9BCI,0","Wix Madefor Display":"YAHO2o-Qfis,0","Wix Madefor Text":"YAHO2rU16Qc,0","Work Sans":"YAGXhLOKv44,0","Yanone Kaffeesatz":"YAFdtbpuM0E,0","Yantramanav":"YAFdJuZAcfY,0","Yellowtail":"YACgEYG4kG4,0","Yeseva One":"YALBs4GWnJw,0","Ysabeau":"YAHMLjcdG48,0","Ysabeau Office":"YAHO2uUYDYI,0","Zalando Sans":"YAHO2k5OK-M,0","Zalando Sans Expanded":"YAHO2h6OPds,0","Zen Kaku Gothic Antique":"YAHO2u8F_xk,0","Zen Kaku Gothic New":"YAHO2tS_yps,0","Zen Maru Gothic":"YAFdJgMrcdw,0","Zen Old Mincho":"YAHO2tMwaEs,0","Zeyada":"YAHO2lP62P0,0","Zilla Slab":"YAFdJpPotmI,0"}}');</script><script src="/_sdk/640c2c9485552aa0.telemetry_sdk.js" integrity="sha512-x7sJNwBS9reCVXham9nBdUp9EtXT/bbNZQpT1cWbDa+n6qr1jm8WdBMFUK+gVfm5CtLZVOtKSGRXT0C+rD4Hdw=="></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مسابقة البحوث البيئية</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;600;700;800&amp;family=Inknut+Antiqua:wght@600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    :root{--forest:#103c36;--teal:#087f78;--mint:#dff4e8;--orange:#f2a742;--paper:#f6f4e9}
+    *{box-sizing:border-box}
+    body{margin:0;width:100%;font-family:"Alegreya Sans",sans-serif;color:var(--forest);background:var(--paper)}
+    .app-shell{width:100%;min-height:100%;background:radial-gradient(circle at 5% 5%,#d8eee3 0,transparent 34%),var(--paper)}
+    .display{font-family:"Alegreya Sans",sans-serif;font-weight:800}
+    .hero{background:var(--forest);color:white;overflow:hidden}
+    .hero-grid{display:grid;grid-template-columns:1.12fr .88fr;min-height:290px}
+    .hero-photo{height:100%;min-height:290px;object-fit:cover;filter:saturate(.8)}
+    .hero-copy{padding:clamp(25px,5vw,64px);display:flex;flex-direction:column;justify-content:center;background:radial-gradient(circle at 100% 0,#1b665b,transparent 60%)}
+    .surface{background:#fffdf8;border:1px solid #dce7df;box-shadow:0 16px 48px #17473a12}
+    .pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:5px 13px;background:#ffffff1c;color:#fff}
+    .primary{background:#e49a35;color:#153e35;font-weight:800;border-radius:14px;padding:12px 25px;transition:transform .2s,filter .2s}
+    .primary:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.06)}
+    .primary:disabled{opacity:.55;cursor:not-allowed}
+    .secondary{border:1px solid #9ac4b4;border-radius:13px;padding:10px 17px;background:white;color:#174e43;font-weight:700}
+    .secondary:hover{background:#e9f5ed}
+    button:focus-visible,input:focus-visible{outline:3px solid #ffad34;outline-offset:3px}
+    .answer{width:100%;min-height:61px;text-align:right;padding:13px 18px;border:2px solid #dce8e1;border-radius:14px;background:white;font-weight:700;line-height:1.4;transition:background .2s,border .2s,transform .2s}
+    .answer:hover:not(:disabled){background:#eaf7ef;border-color:#59a792;transform:translateY(-1px)}
+    .answer.correct{background:#dbf5e2;border-color:#319d65}
+    .answer.wrong{background:#ffe6df;border-color:#d4634c}
+    .answer:disabled{cursor:default}
+    .question-set{display:none}.question-set.active{display:block}
+    .timer{width:75px;height:75px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#f1a640 var(--sweep,100%),#dce8df 0);flex:none}
+    .timer span{display:grid;place-items:center;background:#fffdf8;border-radius:50%;width:62px;height:62px;font-weight:800;font-size:27px}
+    .timer.danger{background:conic-gradient(#d95547 var(--sweep,100%),#dce8df 0)}
+    .media-img{height:220px;max-width:100%;width:100%;object-fit:cover;border-radius:16px}
+    .chart-box{height:220px;position:relative}
+    .feedback{min-height:32px;font-weight:800}
+    .leader-row{display:grid;grid-template-columns:38px 1fr auto auto;gap:12px;align-items:center;border-bottom:1px solid #e6ede7;padding:10px 2px}
+    .leader-row:last-child{border-bottom:0}
+    .rank{width:32px;height:32px;border-radius:50%;background:#e5f4e9;display:grid;place-items:center;font-weight:800}
+    .hidden{display:none!important}
+    @media(max-width:760px){.hero-grid{grid-template-columns:1fr}.hero-photo{height:175px;min-height:0;order:-1}.hero-copy{padding:25px}.leader-row{grid-template-columns:30px 1fr auto;gap:6px}.leader-row .correct-count{display:none}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+  </style>
+  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js" type="text/javascript"></script>
+  <script src="/_sdk/8fed440c6f94b5da.data_sdk.js" type="text/javascript" integrity="sha512-hrvcCCJ6nkL5gG3mdqPDbgyAf9a/fg/zBF51sU5N3rM1WmeSu8K36+6wn9TZeAZrLIonoaPBeVyFsXxXxZjq0w=="></script>
+  <script src="/_sdk/9d41678d006ee11b.editing_sdk.js" type="text/javascript" integrity="sha512-Ebb/q1G7Ju5w6lW2bCf7M0giMpkjzuRef3chCo8rCqL5zFGZ28lEdnx1VdpfPToUoMbcgumcGqlCzobErKJ62w=="></script>
+  <script src="/_sdk/dfeb017e55db4863.resizing_sdk.js" type="text/javascript" integrity="sha512-kbPBNN/FAxsctln1jqNvXyIdF7mIhQx0C+eGGC2IF3mNjNZZcftDT1wFztswSSk4KXRWYHIC3uA9NMfJV4IVUw=="></script>
+ </head>
+ <body data-template-id="__page-root">
+  <div class="app-shell">
+   <header class="hero">
+    <div class="hero-grid">
+     <div class="hero-copy">
+      <p data-template-id="school-name" class="canva-text font-bold tracking-wide text-emerald-200 mb-3">مدرسة الخليل بن عبد الله 11–12</p>
+      <h1 data-template-id="app-title" class="canva-text display leading-tight mb-3">رحلة الباحث البيئي</h1>
+      <p data-template-id="app-subtitle" class="canva-text text-emerald-50 mb-5">30 سؤالًا من درس المنهج العلمي وجمع البيانات البيئية • الصف الحادي عشر</p>
+      <div class="flex flex-wrap gap-2"><span data-template-id="hero-duration" class="canva-tag pill">◷ 30 ثانية لكل سؤال</span> <span data-template-id="hero-points" class="canva-tag pill">✦ الدقة والسرعة تصنعان الفارق</span>
+      </div>
+      <p data-template-id="teacher-name" class="canva-text mt-6 text-amber-200 font-bold">إعداد: رياض بن ناجي بن عمر</p>
+     </div><img data-template-id="hero-image" class="canva-image hero-photo w-full" loading="lazy">
     </div>
-
-    <!-- Main Content Container -->
-    <main class="max-w-7xl mx-auto px-4 py-6 z-10 flex-grow w-full">
-
-        <!-- ================= TAB 1: TYPES OF NUTRITION ================= -->
-        <section id="tab1" class="tab-content block space-y-6 animate-fade-in">
-            <!-- Hero Title -->
-            <div class="glass-card p-6 rounded-3xl border-r-4 border-ocean-gold flex flex-col md:flex-row justify-between items-center gap-4">
-                <div>
-                    <h2 class="text-2xl font-black text-ocean-gold mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-fish-fins"></i> علاقات التغذية والكائنات ذاتية/غير ذاتية التغذية
-                    </h2>
-                    <p class="text-gray-200 text-sm leading-relaxed">
-                        تعتمد كافة أشكال الحياة البحرية على الطاقة المحولة إلى كربوهيدرات. تنقسم الكائنات البحرية بناءً على مصدر حصولها على المغذيات والطاقة إلى كائنات ذاتية التغذية وكائنات غير ذاتية التغذية.
-                    </p>
-                </div>
-                <div class="bg-ocean-dark/50 p-4 rounded-2xl border border-white/10 text-center min-w-[200px]">
-                    <span class="block text-3xl font-black text-ocean-teal mb-1">90%</span>
-                    <span class="text-xs text-gray-300">من الأحياء البحرية تتواجد بالمنطقة الضوئية السطحية</span>
-                </div>
-            </div>
-
-            <!-- Autotrophic vs Heterotrophic Comparison Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Autotrophic Card -->
-                <div class="glass-card p-6 rounded-3xl border-t-4 border-emerald-400 hover:border-emerald-300 transition-all">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-xl font-bold">
-                            <i class="fa-solid fa-[#06d6a0] fa-sun"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-emerald-400">ذاتية التغذية (Autotrophic)</h3>
-                            <p class="text-xs text-gray-400">تصنع غذائها بنفسها من جزيئات بسيطة</p>
-                        </div>
-                    </div>
-                    <ul class="space-y-3 text-sm">
-                        <li class="bg-white/5 p-3 rounded-xl border border-white/5">
-                            <strong class="text-ocean-gold block mb-1">1. التمثيل الضوئي (Photoautotrophs):</strong>
-                            تمتص ضوء الشمس لتكوين المركبات العضوية مثل: العوالق النباتية، طحلب الكلب (Kelp)، وحشائش البحر.
-                        </li>
-                        <li class="bg-white/5 p-3 rounded-xl border border-white/5">
-                            <strong class="text-cyan-400 block mb-1">2. التمثيل الكيميائي (Chemoautotrophs):</strong>
-                            تستخدم الطاقة الكيميائية من المواد الذائبة (مثل كبريتيد الهيدروجين) قرب الفوهات المائية الحرارية قبالة القاع بدون الحاجة للضوء.
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Heterotrophic Card -->
-                <div class="glass-card p-6 rounded-3xl border-t-4 border-ocean-coral hover:border-red-400 transition-all">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-xl bg-ocean-coral/20 flex items-center justify-center text-ocean-coral text-xl font-bold">
-                            <i class="fa-solid fa-drumstick-bite"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-ocean-coral">غير ذاتية التغذية (Heterotrophic)</h3>
-                            <p class="text-xs text-gray-400">تعتمد على التغذي على كائنات أخرى</p>
-                        </div>
-                    </div>
-                    <div class="space-y-2 text-sm">
-                        <p class="text-gray-200">تشمل المستهلكات والمحللات التي تصنف بحسب قربها من المنتجات:</p>
-                        <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-                            <div class="bg-white/5 p-2 rounded-lg border border-white/5">مستهلك أولي: تتغذى مباشرة على المنتجات (آكلات أعشاب).</div>
-                            <div class="bg-white/5 p-2 rounded-lg border border-white/5">مستهلك ثانوي: تتغذى على المستهلكات الأولية.</div>
-                            <div class="bg-white/5 p-2 rounded-lg border border-white/5">مستهلك ثالثي/رابعي: مفترسات تتغذى على المستهلكات الثانوية.</div>
-                            <div class="bg-white/5 p-2 rounded-lg border border-white/5 text-amber-300">المحللات (Decomposers): البكتيريا والفطريات لتفكيك المغذيات.</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Table 3-2 Interactive Marine Organisms Table -->
-            <div class="glass-card p-6 rounded-3xl border border-white/10">
-                <h3 class="text-lg font-bold text-ocean-gold mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-table-list"></i> جدول (3-2): أمثلة الكائنات الحية البحرية ونوع تغذيتها
-                </h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-right text-sm">
-                        <thead>
-                            <tr class="bg-white/10 text-ocean-gold font-extrabold border-b border-white/10">
-                                <th class="p-3 rounded-r-xl">نوع التغذية</th>
-                                <th class="p-3">الكائن الحي البحري</th>
-                                <th class="p-3 rounded-l-xl">الوصف وسلوك التغذية التفصيلي</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-white/5">
-                            <tr class="hover:bg-white/5 transition-colors">
-                                <td class="p-3 font-bold text-emerald-400"><i class="fa-solid fa-leaf ml-1"></i> آكل الأعشاب (Herbivore)</td>
-                                <td class="p-3 font-semibold text-white">أسماك الببغاء (Parrotfish)</td>
-                                <td class="p-3 text-gray-300">أسماك تتغذى مباشرة على الطحالب البارزة على الشعاب المرجانية.</td>
-                            </tr>
-                            <tr class="hover:bg-white/5 transition-colors">
-                                <td class="p-3 font-bold text-cyan-400"><i class="fa-solid fa-[#00b4d8] fa-utensils ml-1"></i> القارت (Omnivore)</td>
-                                <td class="p-3 font-semibold text-white">سرطان البحر / المثقبات / الكريل</td>
-                                <td class="p-3 text-gray-300">سرطان البحر يأكل الطحالب وصغار الأسماك، الكريل يتغذى على العوالق النباتية والحيوانية.</td>
-                            </tr>
-                            <tr class="hover:bg-white/5 transition-colors">
-                                <td class="p-3 font-bold text-ocean-coral"><i class="fa-solid fa-skull-crossbones ml-1"></i> آكل اللحوم (Carnivore)</td>
-                                <td class="p-3 font-semibold text-white">الفقمات (Seals) / القرش</td>
-                                <td class="p-3 text-gray-300">الفقمات تصطاد وتأكل الحبار والروبيان والأسماك. المفترسات البحرية تمتلك سرعة وتكيفات حادة.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Predation & Balance Interactive Highlight -->
-            <div class="glass-card p-6 rounded-3xl bg-gradient-to-r from-ocean-dark/80 to-ocean-deep border border-ocean-gold/30">
-                <div class="flex flex-col md:flex-row items-center gap-6">
-                    <div class="text-4xl text-ocean-gold">
-                        <i class="fa-solid fa-star-of-david"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-lg font-bold text-white mb-1">أهمية المفترس والتوازن البيئي (مثال نجم البحر وبلح البحر)</h4>
-                        <p class="text-sm text-gray-300 leading-relaxed">
-                            بدون مفترس طبيعي مثل <strong class="text-ocean-gold">نجم البحر</strong>، ستزداد أعداد جماعات بلح البحر وقنافذ البحر والمحار بشكل مفرط، مما يؤدي إلى تدمير كامل لغابات <strong class="text-emerald-400">طحلب الكلب (Kelp)</strong> والقضاء على الموئل المائي للأنواع الأخرى.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= TAB 2: OCEAN ZONES & PRODUCTIVITY ================= -->
-        <section id="tab2" class="tab-content hidden space-y-6 animate-fade-in">
-            <!-- Ocean Layers Diagram -->
-            <div class="glass-card p-6 rounded-3xl border border-white/10">
-                <h2 class="text-2xl font-black text-cyan-300 mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-water"></i> طبقات المحيط ونطاقات الإنتاجية (الشكل 3-1)
-                </h2>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-                    <!-- Layer Stack Interactive Visualization -->
-                    <div class="lg:col-span-2 space-y-2">
-                        <!-- Photic Zone -->
-                        <div class="p-4 rounded-2xl bg-gradient-to-r from-yellow-400/30 to-emerald-500/30 border border-yellow-300/40 relative overflow-hidden group hover:scale-[1.01] transition-transform">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="font-extrabold text-yellow-300 text-base">المنطقة الضوئية (Photic Zone)</span>
-                                <span class="text-xs bg-yellow-400/20 text-yellow-200 px-2 py-1 rounded-full font-bold">0 - 200m</span>
-                            </div>
-                            <p class="text-xs text-gray-200">تخترقها أشعة الشمس. تحتوي على 90% من الحياة البحرية وعمليات التمثيل الضوئي.</p>
-                        </div>
-
-                        <!-- Thermocline -->
-                        <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-600/30 to-blue-600/30 border border-emerald-400/30 relative overflow-hidden group hover:scale-[1.01] transition-transform">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="font-extrabold text-cyan-300 text-base">المنحدر الحراري (Thermocline / Pycnocline)</span>
-                                <span class="text-xs bg-cyan-400/20 text-cyan-200 px-2 py-1 rounded-full font-bold">200 - 1000m</span>
-                            </div>
-                            <p class="text-xs text-gray-200">منطقة انتقالية تدرجية بين الماء الدافئ الأقل كثافة والماء البارد الأكثر كثافة، تقلل اختلاط الطبقات.</p>
-                        </div>
-
-                        <!-- Deep Water -->
-                        <div class="p-4 rounded-2xl bg-gradient-to-r from-blue-900/40 to-slate-950/60 border border-blue-500/30 relative overflow-hidden group hover:scale-[1.01] transition-transform">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="font-extrabold text-blue-300 text-base">المياه العميقة وقاع المحيط (Deep Ocean & Vents)</span>
-                                <span class="text-xs bg-blue-400/20 text-blue-200 px-2 py-1 rounded-full font-bold">1000 - 5000m+</span>
-                            </div>
-                            <p class="text-xs text-gray-200">ظلام تام ومياه غنية بالمغذيات. تعتمد على الفوهات المائية الحرارية والتمثيل الكيميائي للبكتيريا المحبة للظروف القاسية (Extremophiles).</p>
-                        </div>
-                    </div>
-
-                    <!-- Side Info Box -->
-                    <div class="bg-white/5 p-5 rounded-2xl border border-white/10 space-y-3">
-                        <h4 class="font-bold text-ocean-gold text-base border-b border-white/10 pb-2">التوازن الأمثل للإنتاجية</h4>
-                        <p class="text-xs text-gray-300 leading-relaxed">
-                            يكون موقع الإنتاجية الأعلى غالباً بالقرب من <strong class="text-cyan-300">المنحدر الحراري</strong> حيث يكمن التوازن الأمثل بين:
-                        </p>
-                        <ul class="text-xs space-y-1.5 text-gray-200">
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> شدة الضوء المناسبة.</li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> درجة الحرارة الملائمة.</li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> توافر المغذيات الصاعدة من الأعماق.</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Concepts of Productivity & Algal Bloom -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Productivity Concepts -->
-                <div class="glass-card p-6 rounded-3xl border-r-4 border-ocean-teal">
-                    <h3 class="text-lg font-bold text-ocean-teal mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-line"></i> الإنتاجية الأولية والثانوية
-                    </h3>
-                    <div class="space-y-3 text-sm">
-                        <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-                            <strong class="text-ocean-gold block mb-1">الإنتاجية الأولية (Primary Productivity):</strong>
-                            معدل إنتاج الكتلة الحيوية الجديدة بواسطة الذاتية التغذية لكل وحدة مساحة أو حجم لكل وحدة زمنية.
-                        </div>
-                        <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-                            <strong class="text-emerald-400 block mb-1">صافي الإنتاجية الأولية (NPP):</strong>
-                            الكتلة الحيوية المتبقية من المنتجات المتاحة للمستهلكات بعد استهلاك جزء منها في التنفس.
-                        </div>
-                        <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-                            <strong class="text-cyan-400 block mb-1">الإنتاجية الثانوية (Secondary Productivity):</strong>
-                            معدل إنتاج الكتلة الحيوية الجديدة بواسطة المستهلكات بعد التغذي على المنتجات.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Algal Bloom & Eutrophication -->
-                <div class="glass-card p-6 rounded-3xl border-r-4 border-ocean-coral">
-                    <h3 class="text-lg font-bold text-ocean-coral mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-triangle-exclamation"></i> ازدهار الطحالب والإثراء الغذائي (Eutrophication)
-                    </h3>
-                    <p class="text-xs text-gray-300 mb-3 leading-relaxed">
-                        عند زيادة المغذيات بسرعة تحدث ظاهرة **ازدهار الطحالب (Algal Bloom)** التي ينتج عنها حتى 5 ملايين خلية/لتر ماء.
-                    </p>
-                    <div class="bg-black/30 p-3 rounded-xl border border-white/10 space-y-2 text-xs">
-                        <div class="flex items-center gap-2 text-red-300">
-                            <i class="fa-solid fa-1"></i>
-                            <span>سد خياشيم الأسماك ومنع امتصاص الأكسجين.</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-red-300">
-                            <i class="fa-solid fa-2"></i>
-                            <span>موت الطحالب وتحللها بواسطة المحللات البكتيرية.</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-red-300">
-                            <i class="fa-solid fa-3"></i>
-                            <span>استنفاد الأكسجين المذاب بسبب تنفس البكتيريا مما يسبب موت الأحياء.</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-red-300">
-                            <i class="fa-solid fa-4"></i>
-                            <span>فرز سموم طحلبية تسمم خراف البحر، الدلافين، والإنسان عند أكل المحاريات.</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= TAB 3: ENERGY TRANSFER & FORMULA ================= -->
-        <section id="tab3" class="tab-content hidden space-y-6 animate-fade-in">
-            <!-- Sun Energy Fate (Figure 3-2 summary) -->
-            <div class="glass-card p-6 rounded-3xl border border-white/10">
-                <h2 class="text-2xl font-black text-emerald-400 mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-bolt"></i> مصير الطاقة الشمسية وانتقالها (الشكل 3-2)
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                        <span class="block text-2xl font-black text-yellow-300">0.06% - 1%</span>
-                        <span class="text-xs text-gray-300">فقط من الطاقة الشمسية تثبتها المنتجات المائية</span>
-                    </div>
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                        <span class="block text-2xl font-black text-red-400">انعكاس وتشتت</span>
-                        <span class="text-xs text-gray-300">معظم الإشعاع ينعكس أو يمتص بالماء</span>
-                    </div>
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                        <span class="block text-2xl font-black text-emerald-400">طول موجي</span>
-                        <span class="text-xs text-gray-300">الكلوروفيل يمتص الأحمر/الأزرق ويعكس الأخضر</span>
-                    </div>
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                        <span class="block text-2xl font-black text-cyan-300">~10%</span>
-                        <span class="text-xs text-gray-300">كفاءة نقل الطاقة التقريبية بين المستويات</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Energy Equation Simulator & Formula C = P + R + F + U -->
-            <div class="glass-card p-6 rounded-3xl border-2 border-emerald-400/40 relative overflow-hidden">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                    <div>
-                        <h3 class="text-xl font-black text-emerald-400 flex items-center gap-2">
-                            <i class="fa-solid fa-calculator"></i> حاسبة تفاعلية لمعادلة نقل الطاقة المستهلكة
-                        </h3>
-                        <p class="text-xs text-gray-300">بناءً على صيغة الشكل (3-3): <strong class="text-ocean-gold text-base font-mono">C = P + R + F + U</strong></p>
-                    </div>
-                    <div class="bg-emerald-500/20 text-emerald-300 text-xs px-3 py-1.5 rounded-xl border border-emerald-400/30">
-                        وحدة القياس: <span class="font-mono">kJ / m² / year</span>
-                    </div>
-                </div>
-
-                <!-- Equation Components Breakdown -->
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6 text-center text-xs font-bold">
-                    <div class="bg-white/10 p-3 rounded-xl border border-white/10">
-                        <span class="block text-lg text-ocean-gold font-mono">C</span>
-                        <span class="text-gray-300">الطاقة المستهلكة</span>
-                    </div>
-                    <div class="bg-white/10 p-3 rounded-xl border border-white/10">
-                        <span class="block text-lg text-emerald-400 font-mono">P</span>
-                        <span class="text-gray-300">إنتاج كتلة جديدة</span>
-                    </div>
-                    <div class="bg-white/10 p-3 rounded-xl border border-white/10">
-                        <span class="block text-lg text-red-400 font-mono">R</span>
-                        <span class="text-gray-300">فقد حرارة التنفس</span>
-                    </div>
-                    <div class="bg-white/10 p-3 rounded-xl border border-white/10">
-                        <span class="block text-lg text-amber-400 font-mono">F</span>
-                        <span class="text-gray-300">طاقة البراز</span>
-                    </div>
-                    <div class="bg-white/10 p-3 rounded-xl border border-white/10 col-span-2 md:col-span-1">
-                        <span class="block text-lg text-purple-400 font-mono">U</span>
-                        <span class="text-gray-300">طاقة البول والأيض</span>
-                    </div>
-                </div>
-
-                <!-- Simulator Controls & Calculation Form -->
-                <div class="bg-black/30 p-6 rounded-2xl border border-white/10 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-                    <div class="space-y-4 col-span-2">
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-300 mb-1">C (إجمالي الطاقة)</label>
-                                <input type="number" id="input-C" value="598" oninput="calculateEnergy()" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-emerald-400">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-300 mb-1">F (البراز)</label>
-                                <input type="number" id="input-F" value="67" oninput="calculateEnergy()" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-emerald-400">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-300 mb-1">U (البول والأيض)</label>
-                                <input type="number" id="input-U" value="500" oninput="calculateEnergy()" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-emerald-400">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-300 mb-1">P (الكتلة الجديدة)</label>
-                                <input type="number" id="input-P" value="0" oninput="calculateEnergy()" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-emerald-400">
-                            </div>
-                        </div>
-                        <p class="text-xs text-gray-400 italic">مثال الكتاب (الشكل 3-7): الطاقة المفقودة في التنفس X = C - (F + P) = 598 - (67 + 500) = 31</p>
-                    </div>
-
-                    <!-- Calculated Output -->
-                    <div class="bg-gradient-to-br from-emerald-600/30 to-ocean-dark p-4 rounded-2xl border border-emerald-400/40 text-center">
-                        <span class="text-xs font-bold text-emerald-300 block mb-1">الطاقة المفقودة في التنفس (R)</span>
-                        <span id="output-R" class="text-3xl font-black text-ocean-gold font-mono">31</span>
-                        <span class="text-xs text-gray-300 block mt-1 font-mono">kJ/m²/year</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= TAB 4: ECOLOGICAL PYRAMIDS ================= -->
-        <section id="tab4" class="tab-content hidden space-y-6 animate-fade-in">
-            <!-- Header & Intro -->
-            <div class="glass-card p-6 rounded-3xl border border-white/10">
-                <h2 class="text-2xl font-black text-coral-400 mb-2 flex items-center gap-2">
-                    <i class="fa-solid fa-chart-pyramid"></i> الأهرامات البيئية البحرية المقارنة
-                </h2>
-                <p class="text-xs text-gray-300 leading-relaxed">
-                    تُستخدم الأهرامات البيئية لتوضيح علاقات التغذية عبر أشرطة مرتبة أفورياً تُمثل السلسلة الغذائية (المنتجات بالقاع يعلوها المستهلكات).
-                </p>
-            </div>
-
-            <!-- Pyramid Types Dynamic Selector Switcher -->
-            <div class="flex justify-center gap-3">
-                <button onclick="showPyramid('numbers')" id="btn-pyr-numbers" class="pyr-tab-btn active px-4 py-2 rounded-xl text-xs font-bold border border-white/20 bg-white/10 hover:bg-white/20 transition-all">
-                    هرم الأعداد (Numbers)
-                </button>
-                <button onclick="showPyramid('biomass')" id="btn-pyr-biomass" class="pyr-tab-btn px-4 py-2 rounded-xl text-xs font-bold border border-white/20 bg-white/10 hover:bg-white/20 transition-all">
-                    هرم الكتلة الحيوية (Biomass)
-                </button>
-                <button onclick="showPyramid('energy')" id="btn-pyr-energy" class="pyr-tab-btn px-4 py-2 rounded-xl text-xs font-bold border border-white/20 bg-white/10 hover:bg-white/20 transition-all">
-                    هرم الطاقة (Energy)
-                </button>
-            </div>
-
-            <!-- Dynamic Pyramid Visualizer Area -->
-            <div class="glass-card p-8 rounded-3xl border border-white/10 flex flex-col items-center justify-center min-h-[350px]" id="pyramid-display-area">
-                <!-- Javascript will dynamically populate pyramid bars here -->
-            </div>
-
-            <!-- Pyramids Comprehensive Comparison Table -->
-            <div class="glass-card p-6 rounded-3xl border border-white/10">
-                <h3 class="text-lg font-bold text-ocean-gold mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-code-compare"></i> مقارنة شاملة بين الأهرامات البيئية البحرية Three Pyramids
-                </h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-right text-xs">
-                        <thead>
-                            <tr class="bg-white/10 text-ocean-gold font-bold border-b border-white/10">
-                                <th class="p-3">نوع الهرم</th>
-                                <th class="p-3">ماذا يمثل ويميزه؟</th>
-                                <th class="p-3">سبب إمكانية ظهوره بشكل مقلوب (Inverted)</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-white/5">
-                            <tr class="hover:bg-white/5">
-                                <td class="p-3 font-bold text-coral-400">هرم الأعداد</td>
-                                <td class="p-3 text-gray-300">عدد الكائنات الحية بكل مستوى في لحظة زمنية.</td>
-                                <td class="p-3 text-gray-300">عند تغذية عدة طفيليات صغيرة (مثل قمل البحر) على سمكة سلمون كبيرة واحدة.</td>
-                            </tr>
-                            <tr class="hover:bg-white/5">
-                                <td class="p-3 font-bold text-cyan-300">هرم الكتلة الحيوية</td>
-                                <td class="p-3 text-gray-300">قياس إجمالي الكتلة الجافة (Dry Mass) المحصول القائم Standing crop.</td>
-                                <td class="p-3 text-gray-300">لأن العوالق النباتية يؤكل معظمها فور إنتاجها، ولكن معدل تكاثرها ودورانها سريع جداً.</td>
-                            </tr>
-                            <tr class="hover:bg-white/5">
-                                <td class="p-3 font-bold text-emerald-400">هرم الطاقة</td>
-                                <td class="p-3 text-gray-300">معدل إنتاج الكتلة على مدار سنة (kJ/m²/year). الأكثر فائدة ودقة.</td>
-                                <td class="p-3 font-emerald-300 font-bold">دائماً مستقيم قائم ومستحيل أن يكون مقلوباً لأن الطاقة تفقد دائماً عبر التنفس والفضلات.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= TAB 5: FINAL ASSESSMENT ================= -->
-        <section id="tab5" class="tab-content hidden space-y-6 animate-fade-in">
-            <!-- Quiz Header -->
-            <div class="glass-card p-6 rounded-3xl border-2 border-ocean-gold/50 flex flex-col md:flex-row justify-between items-center gap-4">
-                <div>
-                    <h2 class="text-2xl font-black text-ocean-gold mb-1 flex items-center gap-2">
-                        <i class="fa-solid fa-clipboard-check"></i> التقويم الختامي للدرس
-                    </h2>
-                    <p class="text-xs text-gray-200">أجب عن جميع الأسئلة التالية للحصول على **شهادة الإنجاز المعتمدة** من المدرسة!</p>
-                </div>
-                <!-- Student Name Input -->
-                <div class="w-full md:w-auto">
-                    <input type="text" id="student-name-input" placeholder="أدخل اسم الطالب الثلاثي..." class="bg-white/10 border border-ocean-gold/50 rounded-xl px-4 py-2 text-white text-sm w-full md:w-64 focus:outline-none focus:border-ocean-gold">
-                </div>
-            </div>
-
-            <!-- Quiz Container -->
-            <div id="quiz-container" class="space-y-6">
-                <!-- Questions injected via JavaScript -->
-            </div>
-
-            <!-- Quiz Submit Action -->
-            <div class="text-center pt-4">
-                <button onclick="submitQuiz()" class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-ocean-gold via-emerald-400 to-ocean-teal text-ocean-deep font-black text-lg shadow-xl hover:scale-105 transition-all flex items-center gap-2 mx-auto">
-                    <i class="fa-solid fa-paper-plane"></i>
-                    <span>اعتماد الإجابات واستخراج الشهادة</span>
-                </button>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Certificate Modal (Hidden by Default) -->
-    <div id="certificate-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white text-slate-900 rounded-3xl p-8 max-w-2xl w-full border-8 border-ocean-gold shadow-2xl relative text-center space-y-4">
-            <button onclick="closeCertificate()" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-slate-200 text-slate-700 hover:bg-slate-300 flex items-center justify-center font-bold">✕</button>
-            
-            <div class="border-4 border-dashed border-ocean-dark/20 p-6 rounded-2xl space-y-4">
-                <!-- School & Teacher Header -->
-                <div class="flex justify-between items-center border-b pb-3 border-slate-200">
-                    <div class="text-right">
-                        <h4 class="font-bold text-ocean-dark text-sm">مدرسة الخليل بن عبد الله (11-12)</h4>
-                        <p class="text-xs text-slate-500">مادة العلوم البيئية - الصف الحادي عشر</p>
-                    </div>
-                    <div class="text-left">
-                        <h4 class="font-bold text-ocean-dark text-sm">إشراف: أ. رياض بن ناجي بن عمر</h4>
-                        <p class="text-xs text-slate-500">الفصل الدراسي الأول</p>
-                    </div>
-                </div>
-
-                <!-- Certificate Main Title -->
-                <div class="py-2">
-                    <i class="fa-solid fa-award text-5xl text-ocean-gold mb-2"></i>
-                    <h2 class="text-3xl font-extrabold text-ocean-dark tracking-wide">شَهَادَةُ إِنْجَازٍ وَتَفَوُّقٍ</h2>
-                    <p class="text-xs text-slate-500 mt-1">تشهد إدارة مدرسة الخليل بن عبد الله بأن الطالب/طالبة:</p>
-                </div>
-
-                <!-- Student Name Display -->
-                <div class="py-2 border-b border-t border-slate-200">
-                    <h3 id="cert-student-name" class="text-2xl font-black text-emerald-600">طالب متميز</h3>
-                </div>
-
-                <!-- Achievement Description -->
-                <p class="text-sm text-slate-700 leading-relaxed">
-                    قد أتم بنجاح واقتدار الكفايات التعليمية والتقويم الختامي لدرس: <br>
-                    <strong class="text-ocean-dark">"علاقات التغذية والنظم البيئية البحرية"</strong> <br>
-                    بدرجة متفوقة قدرها: <span id="cert-score" class="font-extrabold text-ocean-coral text-lg">100%</span>
-                </p>
-
-                <!-- Certificate Footer -->
-                <div class="flex justify-between items-end pt-4">
-                    <div class="text-center text-xs">
-                        <p class="font-bold text-slate-600">مدرس المادة</p>
-                        <p class="text-ocean-dark font-extrabold mt-4">أ. رياض بن ناجي بن عمر</p>
-                    </div>
-                    <div class="text-center text-xs">
-                        <p class="font-bold text-slate-600">ختم المدرسة والتاريخ</p>
-                        <p class="text-slate-400 mt-4 font-mono" id="cert-date">2026/11/05</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Print Button -->
-            <button onclick="window.print()" class="px-6 py-2.5 rounded-xl bg-ocean-dark text-white text-sm font-bold hover:bg-ocean-blue transition-all flex items-center gap-2 mx-auto">
-                <i class="fa-solid fa-print"></i>
-                <span>طباعة الشهادة</span>
-            </button>
-        </div>
+   </header>
+   <main class="w-full max-w-6xl mx-auto px-4 md:px-8 py-7">
+    <div class="flex flex-wrap gap-3 items-center justify-between mb-6">
+     <p data-template-id="unit-label" class="canva-text font-bold text-teal-800">الوحدة الثانية / البحوث البيئية وجمع البيانات</p><button id="sound-toggle" type="button" class="secondary" aria-pressed="true"><span data-template-id="sound-on" class="canva-text">♫ الصوت: يعمل</span><span data-template-id="sound-off" class="canva-text hidden">♫ الصوت: مكتوم</span></button>
     </div>
-
-    <!-- Audio Speech Toast Overlay -->
-    <div id="speech-toast" class="fixed bottom-6 right-6 z-50 bg-emerald-500 text-ocean-deep px-6 py-3 rounded-2xl font-black text-lg shadow-2xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 border-2 border-white">
-        <i class="fa-solid fa-[#031927] fa-circle-check text-2xl"></i>
-        <span id="toast-text">أَحْسَنْتْ، رَائعْ!</span>
-    </div>
-
-    <!-- Footer Section -->
-    <footer class="glass-nav py-4 px-4 text-center text-xs text-gray-400 z-10 border-t border-white/10 mt-6">
-        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
-            <p>© 2026 جميع الحقوق محفوظة - مدرسة الخليل بن عبد الله (11-12)</p>
-            <p class="text-ocean-gold">تصميم وتطوير الدرس التفاعلي: أ. رياض بن ناجي بن عمر</p>
+    <section id="start-screen" class="grid lg:grid-cols-[1.15fr_.85fr] gap-5">
+     <div data-template-id="intro-card" class="canva-card surface rounded-3xl p-6 md:p-9">
+      <p data-template-id="intro-eyebrow" class="canva-text text-teal-700 font-extrabold mb-2">جاهز للاستكشاف؟</p>
+      <h2 data-template-id="intro-heading" class="canva-text display mb-3">ابدأ التحدي العلمي</h2>
+      <p data-template-id="intro-body" class="canva-text text-slate-600 mb-5">أجب عن 30 سؤالًا متنوعًا. تحصل على 100 نقطة للإجابة الصحيحة، و3 نقاط إضافية عن كل ثانية متبقية.</p>
+      <form id="start-form" class="space-y-3"><label data-template-id="name-label" for="student-name" class="canva-text block font-bold">اسم الطالب الكامل</label> <input id="student-name" type="text" maxlength="70" required autocomplete="name" class="w-full rounded-xl border-2 border-emerald-200 px-4 py-3 bg-white" aria-describedby="one-attempt-note">
+       <p data-template-id="one-attempt-note" class="canva-text text-slate-600" id="one-attempt-note">محاولة واحدة لكل اسم. لا تغلق الصفحة أثناء المسابقة، وستُحفظ نتيجتك عند انتهائها.</p><button data-template-id="start-button" id="start-button" type="submit" class="canva-button primary">ابدأ المسابقة ←</button>
+      </form>
+      <p id="start-status" role="status" class="mt-4 font-bold text-rose-700" aria-live="polite"></p>
+     </div>
+     <aside data-template-id="start-aside" class="canva-panel surface rounded-3xl p-6 md:p-8">
+      <h2 data-template-id="aside-heading" class="canva-text display mb-3">لوحة المتصدرين</h2>
+      <p data-template-id="aside-caption" class="canva-text text-slate-600 mb-4">تُرتَّب النتائج بالنقاط، ثم الإجابات الصحيحة، ثم سرعة الإنجاز.</p>
+      <div id="leaderboard-start" aria-live="polite"></div>
+      <p data-template-id="teacher-note" class="canva-text text-sm text-slate-600 mt-5 border-t pt-4">للمعلم: يمكن عرض نتائج الطلاب كاملةً من زر «البيانات» أعلى المسابقة في Canva. الاسم وحده لا يثبت هوية الطالب؛ يُرجى مراجعة الأسماء قبل اعتماد النتائج.</p>
+     </aside>
+    </section>
+    <section id="quiz-screen" class="hidden">
+     <div data-template-id="quiz-card" class="canva-card surface rounded-3xl p-5 md:p-8">
+      <div class="flex gap-4 items-center justify-between mb-4">
+       <div>
+        <p id="question-counter" class="font-bold text-teal-700" aria-live="polite"></p>
+        <p id="live-score" class="font-bold text-slate-600"></p>
+       </div>
+       <div class="timer" id="timer-ring" role="timer" aria-label="الثواني المتبقية">
+        <span id="seconds-left">30</span>
+       </div>
+      </div>
+      <div class="h-2 rounded-full bg-emerald-100 overflow-hidden mb-6">
+       <div id="progress" class="h-full bg-teal-600 transition-all" style="width:0"></div>
+      </div>
+      <div id="question-bank">
+       <section class="question-set" data-correct="1">
+        <h2 data-template-id="q1" class="canva-text display mb-5">ما الخطوة الأولى في المنهج العلمي؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q1a" class="canva-button answer" type="button">عرض النتائج</button><button data-template-id="q1b" class="canva-button answer" type="button">إجراء الملاحظة أو طرح سؤال</button><button data-template-id="q1c" class="canva-button answer" type="button">اختيار المقياس</button><button data-template-id="q1d" class="canva-button answer" type="button">حساب المتوسط</button>
         </div>
-    </footer>
-
-    <!-- JavaScript Logic Section -->
-    <script>
-        // Web Audio API Sound Synthesizer (No external sound files required)
-        let audioCtx = null;
-        let soundEnabled = true;
-
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-        }
-
-        // Sound FX generators
-        function playSound(type) {
-            if (!soundEnabled) return;
-            initAudio();
-            if (!audioCtx) return;
-
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            const now = audioCtx.currentTime;
-
-            if (type === 'click') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
-                osc.start(now);
-                osc.stop(now + 0.05);
-            } else if (type === 'correct') {
-                // Success Chime
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(523.25, now); // C5
-                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
-                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-                osc.start(now);
-                osc.stop(now + 0.4);
-            } else if (type === 'wrong') {
-                // Low Error Sound
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(200, now);
-                osc.frequency.linearRampToValueAtTime(100, now + 0.2);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-                osc.start(now);
-                osc.stop(now + 0.2);
-            }
-        }
-
-        function toggleAudio() {
-            soundEnabled = !soundEnabled;
-            const icon = document.getElementById('sound-icon');
-            if (soundEnabled) {
-                icon.className = 'fa-solid fa-volume-high text-lg';
-            } else {
-                icon.className = 'fa-solid fa-volume-xmark text-lg text-red-400';
-            }
-        }
-
-        // Speech Toast Popup
-        function showSpeechToast(msg) {
-            playSound('correct');
-            const toast = document.getElementById('speech-toast');
-            const text = document.getElementById('toast-text');
-            text.innerText = msg || "أَحْسَنْتْ، رَائعْ!";
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
-
-        // Fullscreen Toggle Logic
-        function toggleFullScreen() {
-            playSound('click');
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    console.log(`Error attempting to enable full-screen mode: ${err.message}`);
-                });
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
-            }
-        }
-
-        // Navigation Tabs Switcher
-        function switchTab(tabId, progressVal) {
-            playSound('click');
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
-            // Remove active style from buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-
-            // Show target tab
-            const activeTab = document.getElementById(tabId);
-            if(activeTab) activeTab.classList.remove('hidden');
-
-            // Set active button
-            event.currentTarget.classList.add('active');
-
-            // Update Progress Bar
-            document.getElementById('progress-bar').style.width = progressVal + '%';
-            document.getElementById('progress-text').innerText = 'التقدم: ' + progressVal + '%';
-        }
-
-        // Dynamic Background Bubbles Generator
-        function generateBubbles() {
-            const container = document.getElementById('bubbles-container');
-            for (let i = 0; i < 15; i++) {
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
-                const size = Math.random() * 40 + 10 + 'px';
-                bubble.style.width = size;
-                bubble.style.height = size;
-                bubble.style.left = Math.random() * 100 + '%';
-                bubble.style.animationDelay = Math.random() * 10 + 's';
-                bubble.style.animationDuration = (Math.random() * 10 + 8) + 's';
-                container.appendChild(bubble);
-            }
-        }
-
-        // Tab 3: Energy Formula Simulator Logic
-        function calculateEnergy() {
-            const C = parseFloat(document.getElementById('input-C').value) || 0;
-            const F = parseFloat(document.getElementById('input-F').value) || 0;
-            const U = parseFloat(document.getElementById('input-U').value) || 0;
-            const P = parseFloat(document.getElementById('input-P').value) || 0;
-
-            // C = P + R + F + U  ==>  R = C - (P + F + U)
-            const R = C - (P + F + U);
-            document.getElementById('output-R').innerText = R >= 0 ? R : 'غير ممكن';
-        }
-
-        // Tab 4: Ecological Pyramids Dynamic Display
-        const pyramidData = {
-            numbers: {
-                title: "هرم الأعداد البحرية (Pyramid of Numbers)",
-                subtitle: "يوضح عدد الكائنات الحية في كل مستوى (قد يبدو مقلوباً في حالة الطفيليات)",
-                bars: [
-                    { label: "مستهلك ثالثي (طفيليات قمل البحر)", width: "90%", color: "bg-yellow-400", count: "أعداد غفيرة جداً" },
-                    { label: "مستهلك ثانوي (أسماك السلمون)", width: "30%", color: "bg-coral-400", count: "عدد أفراده قليل" },
-                    { label: "مستهلك أولي (الكريل والعوالق الحيوانية)", width: "60%", color: "bg-cyan-400", count: "آلاف الكائنات" },
-                    { label: "المنتجات (العوالق النباتية)", width: "85%", color: "bg-emerald-400", count: "ملايين الخلايا" }
-                ]
-            },
-            biomass: {
-                title: "هرم الكتلة الحيوية (Pyramid of Biomass)",
-                subtitle: "يقيس الكتلة الجافة للمحصول القائم (قد يكون مقلوباً للعوالق النباتية لسرعة استهلاكها وتكاثرها)",
-                bars: [
-                    { label: "مستهلكات ثالثية", width: "25%", color: "bg-coral-400", count: "كتلة قليلة" },
-                    { label: "مستهلكات ثانوية (أسماك)", width: "45%", color: "bg-yellow-400", count: "كتلة متوسطة" },
-                    { label: "مستهلكات أولية (عوالق حيوانية)", width: "70%", color: "bg-cyan-400", count: "كتلة حيوية أكبر" },
-                    { label: "منتجات (عوالق نباتية ذات معدل دوران سريع)", width: "35%", color: "bg-emerald-400", count: "محصول قائم صغير في لحظة القياس" }
-                ]
-            },
-            energy: {
-                title: "هرم الطاقة (Pyramid of Energy)",
-                subtitle: "يقيس معدل إنتاج الطاقة (kJ/m²/year) - مستقيم دائماً ولا يمكن أن يكون مقلوباً أبداً",
-                bars: [
-                    { label: "مستهلكات ثالثية (0.1%)", width: "15%", color: "bg-purple-400", count: "0.1% طاقة متبقية" },
-                    { label: "مستهلكات ثانوية (1%)", width: "35%", color: "bg-coral-400", count: "1% من الطاقة" },
-                    { label: "مستهلكات أولية (10%)", width: "60%", color: "bg-cyan-400", count: "10% طاقة منقولة" },
-                    { label: "المنتجات البحرية (100%)", width: "100%", color: "bg-emerald-400", count: "100% الطاقة الأولية المثبتة" }
-                ]
-            }
-        };
-
-        function showPyramid(type) {
-            playSound('click');
-            // Active Tab Styles
-            document.querySelectorAll('.pyr-tab-btn').forEach(btn => btn.classList.remove('bg-ocean-teal', 'text-white'));
-            document.getElementById('btn-pyr-' + type).classList.add('bg-ocean-teal', 'text-white');
-
-            const area = document.getElementById('pyramid-display-area');
-            const data = pyramidData[type];
-
-            let html = `
-                <div class="text-center mb-6">
-                    <h3 class="text-xl font-bold text-ocean-gold">${data.title}</h3>
-                    <p class="text-xs text-gray-300 mt-1">${data.subtitle}</p>
-                </div>
-                <div class="w-full max-w-xl space-y-3 flex flex-col items-center">
-            `;
-
-            data.bars.forEach(bar => {
-                html += `
-                    <div class="w-full flex flex-col items-center">
-                        <div style="width: ${bar.width}" class="${bar.color} text-ocean-deep font-extrabold text-xs py-2.5 px-3 rounded-xl shadow-lg flex justify-between items-center transition-all hover:scale-[1.02]">
-                            <span>${bar.label}</span>
-                            <span class="bg-black/20 px-2 py-0.5 rounded-lg text-[10px] font-mono">${bar.count}</span>
-                        </div>
-                    </div>
-                `;
-            });
-
-            html += `</div>`;
-            area.innerHTML = html;
-        }
-
-        // Tab 5: Final Assessment Quiz Questions Data
-        const quizQuestions = [
-            {
-                id: 1,
-                question: "1. أي من الكائنات الحية البحرية التالية يُعد مثالاً على الكائنات ذاتية التغذية الكيميائية (Chemoautotrophs)؟",
-                options: [
-                    "أسماك الببغاء على الشعاب المرجانية",
-                    "بكتيريا الفوهات المائية الحرارية بقاع المحيط",
-                    "عوالق مجدافيات الأرجل",
-                    "الفقمات التي تصطاد الأسماك"
-                ],
-                correct: 1
-            },
-            {
-                id: 2,
-                question: "2. في أي نطاق من المحيط تتركز حوالي 90% من الحياة البحرية والتمثيل الضوئي؟",
-                options: [
-                    "المياه العميقة (Deep Sea)",
-                    "المنحدر الحراري (Thermocline)",
-                    "المنطقة الضوئية السطحية (Photic Zone 0-200m)",
-                    "قاع المحيط"
-                ],
-                correct: 2
-            },
-            {
-                id: 3,
-                question: "3. إذا كان إجمالي الطاقة المستهلكة لحيوان بحري C=1000، والبراز F=100، والبول U=50، والتنفس R=700. احسب مقدار الطاقة المتبقية لبناء كتلة حيوية جديدة (P):",
-                options: [
-                    "P = 150 kJ/m²/year",
-                    "P = 300 kJ/m²/year",
-                    "P = 850 kJ/m²/year",
-                    "P = 50 kJ/m²/year"
-                ],
-                correct: 0
-            },
-            {
-                id: 4,
-                question: "4. لماذا يمكن أن يظهر هرم الأعداد بحجم مقلوب في النظام البيئي البحري؟",
-                options: [
-                    "لأن الطاقة تتضاعف عند كل مستوى",
-                    "عندما تتغذى عدة طفيليات صغيرة مثل (قمل البحر) على سمكة سلمون واحدة كبيرة",
-                    "بسبب عدم وجود كائنات محللة",
-                    "لأن المنتجات تموت دائماً بسرعة"
-                ],
-                correct: 1
-            },
-            {
-                id: 5,
-                question: "5. أي من الأهرامات البيئية التالية يكون دائماً مستقيماً وشكله قائماً، ولا يمكن أن يكون مقلوباً تحت أي ظرف؟",
-                options: [
-                    "هرم الأعداد",
-                    "هرم الكتلة الحيوية",
-                    "هرم الطاقة (Pyramid of Energy)",
-                    "هرم المحصول القائم"
-                ],
-                correct: 2
-            }
-        ];
-
-        function loadQuiz() {
-            const container = document.getElementById('quiz-container');
-            let html = '';
-            quizQuestions.forEach((q, idx) => {
-                html += `
-                    <div class="glass-card p-6 rounded-3xl border border-white/10 space-y-3">
-                        <h3 class="text-base font-bold text-ocean-gold">${q.question}</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                `;
-                q.options.forEach((opt, optIdx) => {
-                    html += `
-                        <label class="flex items-center gap-3 bg-white/5 p-3 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">
-                            <input type="radio" name="question-${q.id}" value="${optIdx}" onclick="playSound('click')" class="w-4 h-4 text-ocean-teal focus:ring-0">
-                            <span class="text-gray-200">${opt}</span>
-                        </label>
-                    `;
-                });
-                html += `</div></div>`;
-            });
-            container.innerHTML = html;
-        }
-
-        // Submit Quiz & Certificate Trigger
-        function submitQuiz() {
-            const studentName = document.getElementById('student-name-input').value.trim();
-            if (!studentName) {
-                alert('عذراً، يرجى كتابة اسم الطالب الثلاثي أولاً لتوليد الشهادة!');
-                return;
-            }
-
-            let score = 0;
-            quizQuestions.forEach(q => {
-                const selected = document.querySelector(`input[name="question-${q.id}"]:checked`);
-                if (selected && parseInt(selected.value) === q.correct) {
-                    score++;
-                }
-            });
-
-            const percent = Math.round((score / quizQuestions.length) * 100);
-
-            if (percent >= 60) {
-                showSpeechToast("أَحْسَنْتْ، رَائعْ!");
-                document.getElementById('cert-student-name').innerText = studentName;
-                document.getElementById('cert-score').innerText = percent + '%';
-                document.getElementById('cert-date').innerText = new Date().toLocaleDateString('ar-EG');
-                document.getElementById('certificate-modal').classList.remove('hidden');
-            } else {
-                playSound('wrong');
-                alert(`حصلت على ${percent}% (${score} من ${quizQuestions.length}). يرجى مراجعة محتوى الدرس والمحاولة مرة أخرى!`);
-            }
-        }
-
-        function closeCertificate() {
-            playSound('click');
-            document.getElementById('certificate-modal').classList.add('hidden');
-        }
-
-        // Initialize App on Window Load
-        window.onload = function () {
-            generateBubbles();
-            calculateEnergy();
-            showPyramid('energy');
-            loadQuiz();
-        };
-    </script>
-</body>
+       </section>
+       <section class="question-set" data-correct="2">
+        <h2 data-template-id="q2" class="canva-text display mb-5">أي عبارة تصف الفرضية العلمية الجيدة؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q2a" class="canva-button answer" type="button">سؤال لا يمكن قياسه</button><button data-template-id="q2b" class="canva-button answer" type="button">استنتاج نهائي ثابت</button><button data-template-id="q2c" class="canva-button answer" type="button">جملة مختصرة قابلة للاختبار</button><button data-template-id="q2d" class="canva-button answer" type="button">رأي شخصي مطوّل</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="0">
+        <h2 data-template-id="q3" class="canva-text display mb-5">أي مثال يُعد بيانات نوعية؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q3a" class="canva-button answer" type="button">أوراق النبات صفراء</button><button data-template-id="q3b" class="canva-button answer" type="button">سقط 20 مم من المطر</button><button data-template-id="q3c" class="canva-button answer" type="button">عدد الأوراق 12</button><button data-template-id="q3d" class="canva-button answer" type="button">درجة الحرارة 28°م</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="3">
+        <h2 data-template-id="q4" class="canva-text display mb-5">أي مثال يُعد بيانات كمية؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q4a" class="canva-button answer" type="button">لون الماء داكن</button><button data-template-id="q4b" class="canva-button answer" type="button">رائحة التربة نفاذة</button><button data-template-id="q4c" class="canva-button answer" type="button">الأوراق ذابلة</button><button data-template-id="q4d" class="canva-button answer" type="button">كمية المطر 35 مم</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="1">
+        <h2 data-template-id="q5" class="canva-text display mb-5">عند تغيير كمية الماء لدراسة نمو النبات، ما المتغير المستقل؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q5a" class="canva-button answer" type="button">طول النبات</button><button data-template-id="q5b" class="canva-button answer" type="button">كمية الماء</button><button data-template-id="q5c" class="canva-button answer" type="button">عدد الأوراق</button><button data-template-id="q5d" class="canva-button answer" type="button">سرعة النمو</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="2">
+        <h2 data-template-id="q6" class="canva-text display mb-5">في التجربة نفسها، ما المتغير التابع الذي يمكن قياسه؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q6a" class="canva-button answer" type="button">نوع الوعاء</button><button data-template-id="q6b" class="canva-button answer" type="button">كمية الماء المضافة</button><button data-template-id="q6c" class="canva-button answer" type="button">معدل نمو النبات</button><button data-template-id="q6d" class="canva-button answer" type="button">مدة الإضاءة الثابتة</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="0">
+        <h2 data-template-id="q7" class="canva-text display mb-5">ما المجموعة الضابطة عند دراسة تأثير السماد في نمو النباتات؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q7a" class="canva-button answer" type="button">نباتات تُروى دون سماد</button><button data-template-id="q7b" class="canva-button answer" type="button">نباتات تُروى بمحلول سماد</button><button data-template-id="q7c" class="canva-button answer" type="button">نباتات تختلف تربتها وإضاءتها</button><button data-template-id="q7d" class="canva-button answer" type="button">نباتات لم تُقَس</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="3">
+        <h2 data-template-id="q8" class="canva-text display mb-5">ما المتغير الضابط في تجربة تأثير كمية الماء على نمو النبات؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q8a" class="canva-button answer" type="button">الماء المتغير</button><button data-template-id="q8b" class="canva-button answer" type="button">نمو النبات</button><button data-template-id="q8c" class="canva-button answer" type="button">النتيجة النهائية</button><button data-template-id="q8d" class="canva-button answer" type="button">نوع التربة الثابت</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="2">
+        <h2 data-template-id="q9" class="canva-text display mb-5">لماذا نضبط المتغيرات الأخرى في التجربة؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q9a" class="canva-button answer" type="button">لزيادة عدد الفرضيات</button><button data-template-id="q9b" class="canva-button answer" type="button">لتغيير النتائج المطلوبة</button><button data-template-id="q9c" class="canva-button answer" type="button">لعزل أثر المتغير المستقل</button><button data-template-id="q9d" class="canva-button answer" type="button">لمنع تسجيل البيانات</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="1">
+        <h2 data-template-id="q10" class="canva-text display mb-5">ما المقصود بالقيمة الشاذة في مجموعة بيانات؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q10a" class="canva-button answer" type="button">أكثر القيم تكرارًا</button><button data-template-id="q10b" class="canva-button answer" type="button">قيمة تخالف النمط العام</button><button data-template-id="q10c" class="canva-button answer" type="button">وحدة المحور الأفقي</button><button data-template-id="q10d" class="canva-button answer" type="button">نتيجة المجموعة الضابطة</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="0">
+        <h2 data-template-id="q11" class="canva-text display mb-5">أي تمثيل بياني يلائم مقارنة أعداد الحيوانات حسب النوع؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q11a" class="canva-button answer" type="button">الأعمدة</button><button data-template-id="q11b" class="canva-button answer" type="button">الخطي الزمني</button><button data-template-id="q11c" class="canva-button answer" type="button">المبعثر</button><button data-template-id="q11d" class="canva-button answer" type="button">منحنى متصل فقط</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="3">
+        <h2 data-template-id="q12" class="canva-text display mb-5">أي رسم يلائم تتبع درجة الحرارة عبر أيام متتابعة؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q12a" class="canva-button answer" type="button">جدول أنواع فقط</button><button data-template-id="q12b" class="canva-button answer" type="button">رسم الأعمدة للفئات</button><button data-template-id="q12c" class="canva-button answer" type="button">مخطط دائري للفئات</button><button data-template-id="q12d" class="canva-button answer" type="button">التمثيل الخطي</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="1">
+        <h2 data-template-id="q13" class="canva-text display mb-5">في الرسم بالأعمدة، أي حيوان هو الأكثر عددًا؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q13a" class="canva-button answer" type="button">الحمار الوحشي</button><button data-template-id="q13b" class="canva-button answer" type="button">الظبي</button><button data-template-id="q13c" class="canva-button answer" type="button">الفيل</button><button data-template-id="q13d" class="canva-button answer" type="button">الزرافة</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="2">
+        <h2 data-template-id="q14" class="canva-text display mb-5">عند رسم درجة الحرارة في موقعين، ما الذي يتيحه وضع الخطين معًا؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q14a" class="canva-button answer" type="button">إلغاء القيم الشاذة</button><button data-template-id="q14b" class="canva-button answer" type="button">تغيير القياسات</button><button data-template-id="q14c" class="canva-button answer" type="button">مقارنة الاتجاهات</button><button data-template-id="q14d" class="canva-button answer" type="button">إخفاء الفروق</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="0">
+        <h2 data-template-id="q15" class="canva-text display mb-5">ما فائدة اختيار نقاط العينات بأرقام عشوائية؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q15a" class="canva-button answer" type="button">تقليل تحيز الباحث</button><button data-template-id="q15b" class="canva-button answer" type="button">زيادة التحيز عمدًا</button><button data-template-id="q15c" class="canva-button answer" type="button">استبعاد العينات كلها</button><button data-template-id="q15d" class="canva-button answer" type="button">إلغاء الحاجة للقياس</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="3">
+        <h2 data-template-id="q16" class="canva-text display mb-5">جمع عينة عند كل خمسة أمتار مثال على أي استراتيجية؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q16a" class="canva-button answer" type="button">الاصطياد المباشر</button><button data-template-id="q16b" class="canva-button answer" type="button">الاختيار العشوائي</button><button data-template-id="q16c" class="canva-button answer" type="button">التنبؤ النوعي</button><button data-template-id="q16d" class="canva-button answer" type="button">العينات المنتظمة</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="2">
+        <h2 data-template-id="q17" class="canva-text display mb-5">ما الذي يُسجله الباحث في جمع العينات الخطية؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q17a" class="canva-button answer" type="button">لون شريط القياس</button><button data-template-id="q17b" class="canva-button answer" type="button">أعداد الفائزين</button><button data-template-id="q17c" class="canva-button answer" type="button">النباتات الملامسة للمقطع</button><button data-template-id="q17d" class="canva-button answer" type="button">الفرضيات غير المختبرة</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="1">
+        <h2 data-template-id="q18" class="canva-text display mb-5">ما حجم العينة بنسبة 10% من 2750 شجرة؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q18a" class="canva-button answer" type="button">250 شجرة</button><button data-template-id="q18b" class="canva-button answer" type="button">275 شجرة</button><button data-template-id="q18c" class="canva-button answer" type="button">100 شجرة</button><button data-template-id="q18d" class="canva-button answer" type="button">2750 شجرة</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="0">
+        <h2 data-template-id="q19" class="canva-text display mb-5">إذا كانت الجماعة الأحيائية 98 فردًا، فما العدد الذي يشمله المسح وفق الدرس؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q19a" class="canva-button answer" type="button">جميع الأفراد الـ98</button><button data-template-id="q19b" class="canva-button answer" type="button">10 أفراد فقط</button><button data-template-id="q19c" class="canva-button answer" type="button">1000 فرد</button><button data-template-id="q19d" class="canva-button answer" type="button">فرد واحد</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="3">
+        <h2 data-template-id="q20" class="canva-text display mb-5">لأي كائنات تُستخدم المربعات القياسية غالبًا؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q20a" class="canva-button answer" type="button">الطيور المهاجرة</button><button data-template-id="q20b" class="canva-button answer" type="button">الأسماك السريعة</button><button data-template-id="q20c" class="canva-button answer" type="button">الفراشات الطائرة</button><button data-template-id="q20d" class="canva-button answer" type="button">النباتات الثابتة</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="1">
+        <h2 data-template-id="q21" class="canva-text display mb-5">ما الذي يميز المربع القياسي الشبكي عن المفتوح؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q21a" class="canva-button answer" type="button">لا يحدد مساحة</button><button data-template-id="q21b" class="canva-button answer" type="button">مقسّم إلى مربعات أصغر</button><button data-template-id="q21c" class="canva-button answer" type="button">يعمل في الهواء فقط</button><button data-template-id="q21d" class="canva-button answer" type="button">يُستخدم دون تسجيل</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="2">
+        <h2 data-template-id="q22" class="canva-text display mb-5">أي أداة تجمع الحشرات النشطة على سطح الأرض؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q22a" class="canva-button answer" type="button">الرسم الخطي</button><button data-template-id="q22b" class="canva-button answer" type="button">مؤشر سيمبسون</button><button data-template-id="q22c" class="canva-button answer" type="button">المصيدة الشراكية</button><button data-template-id="q22d" class="canva-button answer" type="button">مقياس المحاور</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="0">
+        <h2 data-template-id="q23" class="canva-text display mb-5">ما التقنية المناسبة لجمع الحشرات بين الأعشاب الطويلة؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q23a" class="canva-button answer" type="button">شبكة اصطياد الحشرات</button><button data-template-id="q23b" class="canva-button answer" type="button">مؤشر لينكولن</button><button data-template-id="q23c" class="canva-button answer" type="button">الرسم المبعثر</button><button data-template-id="q23d" class="canva-button answer" type="button">مربع في قاع النهر</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="3">
+        <h2 data-template-id="q24" class="canva-text display mb-5">أين توضع الشبكة عند جمع العينات بالركل؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q24a" class="canva-button answer" type="button">فوق الأشجار</button><button data-template-id="q24b" class="canva-button answer" type="button">بعيدًا عن الماء</button><button data-template-id="q24c" class="canva-button answer" type="button">عند أعلى المنبع دائمًا</button><button data-template-id="q24d" class="canva-button answer" type="button">مع اتجاه جريان الماء</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="1">
+        <h2 data-template-id="q25" class="canva-text display mb-5">إذا كانت n₁=22 وn₂=14 وm₂=2، فما تقدير مؤشر لينكولن؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q25a" class="canva-button answer" type="button">38</button><button data-template-id="q25b" class="canva-button answer" type="button">154</button><button data-template-id="q25c" class="canva-button answer" type="button">308</button><button data-template-id="q25d" class="canva-button answer" type="button">11</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="2">
+        <h2 data-template-id="q26" class="canva-text display mb-5">أي افتراض يحتاج إليه مؤشر لينكولن؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q26a" class="canva-button answer" type="button">الهجرة المستمرة</button><button data-template-id="q26b" class="canva-button answer" type="button">اختفاء العلامات</button><button data-template-id="q26c" class="canva-button answer" type="button">جماعة أحيائية مغلقة</button><button data-template-id="q26d" class="canva-button answer" type="button">عدم اختلاط الأفراد</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="0">
+        <h2 data-template-id="q27" class="canva-text display mb-5">ماذا تعني قيمة مرتفعة لمؤشر سيمبسون قريبة من 1؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q27a" class="canva-button answer" type="button">تنوع بيولوجي مرتفع</button><button data-template-id="q27b" class="canva-button answer" type="button">غياب جميع الأنواع</button><button data-template-id="q27c" class="canva-button answer" type="button">عدم وجود أفراد</button><button data-template-id="q27d" class="canva-button answer" type="button">فشل جمع العينات</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="3">
+        <h2 data-template-id="q28" class="canva-text display mb-5">إذا وُجد النوع في 6 مربعات من أصل 30، فما نسبة تكراره؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q28a" class="canva-button answer" type="button">6%</button><button data-template-id="q28b" class="canva-button answer" type="button">30%</button><button data-template-id="q28c" class="canva-button answer" type="button">66%</button><button data-template-id="q28d" class="canva-button answer" type="button">20%</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="1">
+        <h2 data-template-id="q29" class="canva-text display mb-5">أي رمز في مقياس ACFOR يدل على عدم وجود النوع؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q29a" class="canva-button answer" type="button">A</button><button data-template-id="q29b" class="canva-button answer" type="button">N</button><button data-template-id="q29c" class="canva-button answer" type="button">F</button><button data-template-id="q29d" class="canva-button answer" type="button">R</button>
+        </div>
+       </section>
+       <section class="question-set" data-correct="2">
+        <h2 data-template-id="q30" class="canva-text display mb-5">ما أول ما يجب تحديده عند التخطيط لاستقصاء بيئي؟</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+         <button data-template-id="q30a" class="canva-button answer" type="button">لون لوحة النتائج</button><button data-template-id="q30b" class="canva-button answer" type="button">قيمة المؤشر النهائي</button><button data-template-id="q30c" class="canva-button answer" type="button">سؤال أو مشكلة محددة</button><button data-template-id="q30d" class="canva-button answer" type="button">ترتيب الفائزين</button>
+        </div>
+       </section>
+      </div>
+      <div id="visual-area" class="mt-5 hidden"><img data-template-id="plant-image" class="canva-image media-img hidden" loading="lazy"> <img data-template-id="field-image" class="canva-image media-img hidden" loading="lazy"> <img data-template-id="coral-image" class="canva-image media-img hidden" loading="lazy">
+       <div id="chart-area" class="chart-box surface rounded-2xl p-3 hidden">
+        <canvas id="quiz-chart" role="img" aria-label="تمثيل بياني لبيانات السؤال"></canvas>
+       </div>
+      </div>
+      <p id="feedback" class="feedback mt-5" role="status" aria-live="polite"></p><button id="next-button" data-template-id="next-button" type="button" class="canva-button primary hidden mt-2">السؤال التالي ←</button> <span id="finish-label" data-template-id="finish-label" class="canva-text hidden">عرض النتيجة ←</span>
+     </div>
+    </section>
+    <section id="result-screen" class="hidden grid lg:grid-cols-2 gap-5">
+     <div data-template-id="result-card" class="canva-card surface rounded-3xl p-7">
+      <p data-template-id="result-eyebrow" class="canva-text font-bold text-teal-700">اكتملت الرحلة!</p>
+      <h2 data-template-id="result-heading" class="canva-text display mb-4">نتيجتك النهائية</h2>
+      <p id="result-name" class="font-bold"></p>
+      <p id="result-score" class="display text-5xl text-teal-800 my-3"></p>
+      <p id="result-correct" class="font-bold"></p>
+      <p id="result-time" class="text-slate-600"></p>
+      <p id="save-status" role="status" aria-live="polite" class="font-bold mt-5"></p><button id="retry-save" data-template-id="retry-save" class="canva-button secondary hidden mt-3" type="button">إعادة محاولة حفظ النتيجة</button>
+     </div>
+     <aside data-template-id="result-leaders-card" class="canva-panel surface rounded-3xl p-7">
+      <h2 data-template-id="result-leaders-heading" class="canva-text display mb-3">منصة الفائزين</h2>
+      <div id="leaderboard-end" aria-live="polite"></div>
+     </aside>
+    </section>
+    <template id="leader-template">
+     <div data-template-id="leader-row" class="canva-list leader-row"><span class="rank rank-number"></span><strong data-template-id="leader-name" class="canva-text leader-name"></strong><span data-template-id="leader-score" class="canva-text leader-score font-bold"></span><span data-template-id="leader-correct" class="canva-text correct-count text-slate-500"></span>
+     </div>
+    </template>
+   </main>
+   <footer class="w-full max-w-6xl mx-auto px-4 md:px-8 pb-8">
+    <p data-template-id="footer-text" class="canva-text text-center text-slate-500 border-t pt-5">العلوم البيئية • الصف الحادي عشر • تعلّم، جرّب، واستنتج</p>
+   </footer>
+  </div>
+  <script>
+(() => {
+  const questions=[...document.querySelectorAll('.question-set')];
+  const $=id=>document.getElementById(id);
+  let records=[],ready=false,playing=false,completed=false,saved=false,student='',index=0,score=0,correct=0,elapsed=0,seconds=30,locked=false,tick=null,chart=null,muted=false,audio=null,saving=false;
+  const norm=s=>s.trim().replace(/\s+/g,' ').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').toLocaleLowerCase('ar');
+  function status(id,message){$(id).textContent=message}
+  function sound(kind){
+    if(muted)return;
+    try{
+      audio=audio||new (window.AudioContext||window.webkitAudioContext)();
+      if(audio.state==='suspended')audio.resume();
+      const o=audio.createOscillator(),g=audio.createGain(),t=audio.currentTime;
+      o.type='sine';o.frequency.setValueAtTime(kind==='good'?520:kind==='bad'?230:660,t);
+      o.frequency.exponentialRampToValueAtTime(kind==='good'?800:kind==='bad'?160:470,t+.16);
+      g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.075,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+.2);
+      o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+.21);
+    }catch(e){}
+  }
+  $('sound-toggle').addEventListener('click',()=>{
+    muted=!muted;$('sound-toggle').setAttribute('aria-pressed',String(!muted));
+    $('sound-on').classList.toggle('hidden',muted);$('sound-off').classList.toggle('hidden',!muted);
+    if(!muted)sound('good');
+  });
+  function renderLeaders(){
+    const sorted=[...records].sort((a,b)=>Number(b.score)-Number(a.score)||Number(b.correct_count)-Number(a.correct_count)||Number(a.total_time_seconds)-Number(b.total_time_seconds)).slice(0,8);
+    ['leaderboard-start','leaderboard-end'].forEach(id=>{
+      const host=$(id),existing=new Map([...host.children].map(el=>[el.dataset.key,el]));
+      sorted.forEach((r,i)=>{
+        const key=r.__backendId||norm(String(r.student_name));
+        let row=existing.get(key);
+        if(!row){row=$('leader-template').content.firstElementChild.cloneNode(true);row.dataset.key=key}
+        row.querySelector('.rank-number').textContent=String(i+1);
+        row.querySelector('.leader-name').textContent=String(r.student_name);
+        row.querySelector('.leader-score').textContent=Number(r.score).toLocaleString('ar-OM')+' نقطة';
+        row.querySelector('.correct-count').textContent=String(r.correct_count)+'/30';
+        host.appendChild(row);existing.delete(key);
+      });
+      existing.forEach(el=>el.remove());
+      if(!sorted.length && !host.querySelector('.empty-leaders')){
+        const p=document.createElement('p');p.className='empty-leaders text-slate-500';p.textContent='لم تُسجّل نتائج بعد. كن أول المتصدرين!';host.appendChild(p);
+      }
+      if(sorted.length)host.querySelector('.empty-leaders')?.remove();
+    });
+  }
+  async function init(){
+    try{
+      const result=await window.dataSdk.init({onDataChanged(data){records=data;renderLeaders()}});
+      if(!result.isOk)throw new Error('init');
+      ready=true;$('start-button').disabled=false;status('start-status','');
+    }catch(e){ready=false;status('start-status','تعذر الاتصال بجدول النتائج. حدّث الصفحة لاحقًا؛ لا يمكن بدء محاولة لا تُحفظ نتيجتها.')}
+  }
+  $('start-button').disabled=true;status('start-status','جارٍ الاتصال بجدول النتائج…');init();
+  $('start-form').addEventListener('submit',e=>{
+    e.preventDefault();
+    if(!ready||playing||completed)return;
+    const name=$('student-name').value.trim().replace(/\s+/g,' ');
+    if(name.length<3){status('start-status','أدخل اسمًا من ثلاثة أحرف على الأقل.');return}
+    if(records.some(r=>norm(String(r.student_name))===norm(name))){status('start-status','هذا الاسم لديه نتيجة مسجّلة بالفعل؛ لا تتاح محاولة ثانية للاسم نفسه.');return}
+    if(records.length>=999){status('start-status','اكتمل الحد الأقصى للنتائج (999). يُرجى مراجعة المعلم.');return}
+    student=name;playing=true;sound('good');
+    $('start-screen').classList.add('hidden');$('quiz-screen').classList.remove('hidden');showQuestion();
+  });
+  function showVisual(){
+    ['plant-image','field-image','coral-image','chart-area'].forEach(id=>$(id).classList.add('hidden'));
+    const imageId=({4:'plant-image',6:'plant-image',14:'field-image',16:'field-image',19:'plant-image',22:'field-image',23:'field-image',27:'coral-image'})[index];
+    const chartKind=({10:'bars',11:'line',12:'bars',13:'line'})[index];
+    $('visual-area').classList.toggle('hidden',!imageId&&!chartKind);
+    if(imageId)$(imageId).classList.remove('hidden');
+    if(chart){chart.destroy();chart=null}
+    if(chartKind){
+      $('chart-area').classList.remove('hidden');
+      const bars=chartKind==='bars';
+      chart=new Chart($('quiz-chart'),{
+        type:bars?'bar':'line',
+        data:bars?{labels:['حمار وحشي','ظبي','فيل','زرافة'],datasets:[{label:'عدد الحيوانات',data:[400,720,80,110],backgroundColor:['#eaa349','#0b8178','#74b7a1','#d88967']}]}
+          :{labels:['1','2','3','4','5','6','7'],datasets:[{label:'الموقع 1',data:[13,13,15,17,18,20,17],borderColor:'#087f78',tension:.25},{label:'الموقع 2',data:[18,20,27,25,26,31,29],borderColor:'#ed9e3d',tension:.25}]},
+        options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:true,labels:{font:{family:'Alegreya Sans',size:14}}}},scales:{y:{beginAtZero:bars,title:{display:true,text:bars?'عدد الحيوانات':'درجة الحرارة (°م)'}},x:{title:{display:!bars,text:'اليوم'}}}}
+      });
+    }
+  }
+  function showQuestion(){
+    questions.forEach((q,i)=>q.classList.toggle('active',i===index));
+    locked=false;seconds=30;
+    $('question-counter').textContent=`السؤال ${index+1} من ${questions.length}`;
+    $('live-score').textContent=`رصيدك: ${score.toLocaleString('ar-OM')} نقطة`;
+    $('seconds-left').textContent='30';$('timer-ring').style.setProperty('--sweep','100%');$('timer-ring').classList.remove('danger');
+    $('progress').style.width=`${index/questions.length*100}%`;
+    status('feedback','');$('next-button').classList.add('hidden');$('finish-label').classList.add('hidden');
+    questions[index].querySelectorAll('.answer').forEach(b=>{b.disabled=false;b.classList.remove('correct','wrong')});
+    showVisual();
+    clearInterval(tick);
+    tick=setInterval(()=>{if(locked)return;seconds--;elapsed++;$('seconds-left').textContent=String(seconds);$('timer-ring').style.setProperty('--sweep',`${seconds/30*100}%`);$('timer-ring').classList.toggle('danger',seconds<=8);if(seconds<=0)answer(-1)},1000);
+  }
+  $('question-bank').addEventListener('click',e=>{
+    const btn=e.target.closest('.answer');
+    if(!btn||locked||!playing)return;
+    answer([...questions[index].querySelectorAll('.answer')].indexOf(btn));
+  });
+  function answer(choice){
+    if(locked)return;
+    locked=true;clearInterval(tick);
+    const q=questions[index],right=Number(q.dataset.correct),buttons=[...q.querySelectorAll('.answer')];
+    buttons.forEach(b=>b.disabled=true);buttons[right].classList.add('correct');
+    if(choice===right){correct++;score+=100+seconds*3;status('feedback',`إجابة صحيحة! +${100+seconds*3} نقطة`);sound('good')}
+    else{if(choice>=0)buttons[choice].classList.add('wrong');status('feedback',choice<0?'انتهى الوقت. الإجابة الصحيحة محددة باللون الأخضر.':'إجابة غير صحيحة. الإجابة الصحيحة محددة باللون الأخضر.');sound('bad')}
+    $('live-score').textContent=`رصيدك: ${score.toLocaleString('ar-OM')} نقطة`;
+    $('next-button').classList.remove('hidden');
+    if(index===questions.length-1){$('next-button').classList.add('hidden');$('finish-label').classList.remove('hidden');$('finish-label').classList.add('primary','inline-block','mt-2');$('finish-label').setAttribute('role','button');$('finish-label').setAttribute('tabindex','0')}
+  }
+  async function next(){
+    if(!locked)return;
+    if(index<questions.length-1){index++;showQuestion()}
+    else{playing=false;completed=true;clearInterval(tick);$('quiz-screen').classList.add('hidden');$('result-screen').classList.remove('hidden');$('progress').style.width='100%';
+      status('result-name',student);status('result-score',score.toLocaleString('ar-OM')+' نقطة');status('result-correct',`${correct} إجابة صحيحة من 30`);status('result-time',`زمن الإجابة الكلي: ${elapsed} ثانية`);
+      await saveResult();
+    }
+  }
+  $('next-button').addEventListener('click',next);
+  $('finish-label').addEventListener('click',next);
+  $('finish-label').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();next()}});
+  async function saveResult(){
+    if(saved||saving)return;
+    saving=true;$('retry-save').classList.add('hidden');status('save-status','جارٍ حفظ النتيجة في جدول Canva…');
+    try{
+      if(records.some(r=>norm(String(r.student_name))===norm(student))){status('save-status','توجد نتيجة محفوظة لهذا الاسم؛ لم تُنشأ نتيجة ثانية. راجع المعلم.');return}
+      if(records.length>=999){status('save-status','بلغ جدول النتائج حد 999 سجلاً. راجع المعلم.');$('retry-save').classList.remove('hidden');return}
+      const result=await window.dataSdk.create({student_name:student,score,correct_count:correct,total_time_seconds:elapsed,completed_at:new Date().toISOString()});
+      if(!result.isOk)throw new Error('save');
+      saved=true;status('save-status','حُفظت نتيجتك في جدول Canva بنجاح.');sound('good');
+    }catch(e){status('save-status','تعذر حفظ النتيجة. ابقَ في هذه الصفحة واضغط «إعادة محاولة حفظ النتيجة».');$('retry-save').classList.remove('hidden')}
+    finally{saving=false}
+  }
+  $('retry-save').addEventListener('click',saveResult);
+})();
+</script>
+ </body>
 </html>
